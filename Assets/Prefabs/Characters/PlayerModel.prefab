@@ -504,7 +504,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 561f7679131379548aa99000c0dc941b, type: 2}
+  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1814,7 +1814,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 561f7679131379548aa99000c0dc941b, type: 2}
+  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2465,7 +2465,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6efccf28e0297fd449f23285a4b8a99d, type: 2}
+  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4881,11 +4881,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9392a2c904a10d94789f80704dbd29cc, type: 3}
   - {fileID: 21300000, guid: 58de451d3a5b01643846588abafbeda9, type: 3}
   - {fileID: 21300000, guid: 6a65a7287ecffcf4ab8a4c85d37ced0e, type: 3}
+  - {fileID: 21300000, guid: 9b18ff38e5d2ec243ba6c4faa8d34c5c, type: 3}
   mainTitle: {fileID: 2397567881962680375}
   itemTitles:
   - Battery
   - Health Bag
   - Key
+  - Crown
 --- !u!114 &3222843356587427792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5569,7 +5571,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6efccf28e0297fd449f23285a4b8a99d, type: 2}
+  - {fileID: 2100000, guid: 51396a457ace7ca459c474a7d7ed6ceb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

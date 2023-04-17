@@ -61,6 +61,10 @@ public class SceneLoader : NetworkBehaviour
         if (asyncLoad.isDone)
         {
             Manager.SpawnPlayer();
+            if (isServer)
+            {
+                NetworkServer.SpawnObjects();
+            }
         }
     }
 }

@@ -36,8 +36,10 @@ public class PlayerPickUp : NetworkBehaviour
                     objID = (int)hit.transform.gameObject.GetComponent<ItemTypes>().chooseItem;
                     mainImage.sprite = itemIcons[objID];
                     mainTitle.text = itemTitles[objID];
+                    Debug.Log(hit.collider.name);
                     if (Input.GetKeyDown(KeyCode.E))
                     {
+                      
                         SaveScript.itemAmts[objID]++;
                         CmdDestroyItem(hit.transform.gameObject);
                     }

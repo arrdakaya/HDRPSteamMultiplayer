@@ -8,7 +8,8 @@ public class ItemTypes : MonoBehaviour
     {
         battery,
         medkit,
-        key
+        key,
+        crown
     }
     public typeOfItem chooseItem;
 }
