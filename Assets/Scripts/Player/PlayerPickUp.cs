@@ -26,6 +26,10 @@ public class PlayerPickUp : NetworkBehaviour
         if (!isLocalPlayer) return;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            CutsceneManager.Instance.CmdSwitchToCutscene();
+        }
         if (Physics.SphereCast(transform.position,0.5f,transform.forward,out hit, 30.0f, includeLayer))
         {
             if(Vector3.Distance(transform.position,hit.transform.position) < 6)
