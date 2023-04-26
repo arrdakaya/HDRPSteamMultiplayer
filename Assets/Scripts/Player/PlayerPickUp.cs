@@ -31,12 +31,8 @@ public class PlayerPickUp : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            CutsceneManager.Instance.CmdSwitchToCutscene();
-        }
+       
         if (Physics.Raycast(ray, out hit, 2, includeLayer))
         {
             
@@ -90,7 +86,7 @@ public class PlayerPickUp : NetworkBehaviour
                             hit.transform.gameObject.GetComponent<Animator>().SetTrigger("Close");
                     }
                 }
-            }
+             }
                
         }
         else

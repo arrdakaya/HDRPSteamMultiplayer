@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6942212122131197412}
   - component: {fileID: 6416667792967738757}
   m_Layer: 12
-  m_Name: Cube
+  m_Name: GroundTrapPlacer
   m_TagString: GroundTrap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -504,7 +504,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
+  - {fileID: 2100000, guid: 561f7679131379548aa99000c0dc941b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -991,7 +991,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1949,7 +1949,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
+  - {fileID: 2100000, guid: 561f7679131379548aa99000c0dc941b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2600,7 +2600,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d27c7c586c5918d40928c4c0360ef1df, type: 2}
+  - {fileID: 2100000, guid: 561f7679131379548aa99000c0dc941b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3855,7 +3855,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5962700550446440506}
   m_LocalRotation: {x: -0.000000022351742, y: 3.745745e-11, z: 1.6619102e-11, w: 1}
-  m_LocalPosition: {x: -0, y: 0.093, z: 0.182}
+  m_LocalPosition: {x: -0, y: 0.0781, z: 0.1752}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
