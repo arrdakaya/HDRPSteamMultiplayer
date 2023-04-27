@@ -829,6 +829,7 @@ MonoBehaviour:
   - {fileID: 6139587991379510019, guid: 0035774a2d17e284d8edb234697cbe6e, type: 3}
   - {fileID: 981851730956486948, guid: 0357c4c333f9138409538f0f03cccb8a, type: 3}
   - {fileID: 6942212122131197413, guid: 914f349c4f155d2418f1f62536276b0d, type: 3}
+  - {fileID: 7491344734427100115, guid: dfdc94f4922256145aab3201f3aa14ba, type: 3}
   timeInterpolationGui: 0
   GamePlayerPrefab: {fileID: 8108144209026050801, guid: 95b511732a784bb4c92443a9a22d7b92, type: 3}
   myPlayer:

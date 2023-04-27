@@ -14,6 +14,8 @@ TagManager:
   - GroundTrap
   - LoadingScreen
   - Door
+  - Weapon
+  - PlayerWeapon
   layers:
   - Default
   - TransparentFX
