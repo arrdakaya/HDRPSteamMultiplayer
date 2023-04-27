@@ -1,7 +1,5 @@
 using Mirror;
 using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 
@@ -18,6 +16,7 @@ public class MonsterInteraction : NetworkBehaviour
 
     private int objID = 0;
 
+    private GameObject doorTrigger;
 
     // Start is called before the first frame update
     private void Start()
@@ -72,5 +71,25 @@ public class MonsterInteraction : NetworkBehaviour
             }
 
         }
+    }
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+
+        // Check if the collider belongs to the "Pickup" layer
+        Debug.Log(hit.collider.gameObject.layer);
+        
+            if (hit.gameObject.CompareTag("Door"))
+            {
+            doorTrigger = hit.gameObject;
+            StartCoroutine("TriggerChange");
+            }
+        
+
+    }
+    IEnumerator TriggerChange()
+    {
+       doorTrigger.GetComponent<Collider>().isTrigger = true;
+        yield return new WaitForSeconds(2);
+        doorTrigger.GetComponent<Collider>().isTrigger = false;
     }
 }

@@ -343,7 +343,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4215100004206151775}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: mixamorig:HeadTop_End
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -999,7 +999,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2147483647
+    m_Bits: 8183
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1036,7 +1036,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 129
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 0
   SMAAQuality: 2
@@ -3840,7 +3840,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6977295568444379679}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: PlayerCameraRoot
   m_TagString: CinemachineTarget
   m_Icon: {fileID: 0}
@@ -3855,7 +3855,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5962700550446440506}
   m_LocalRotation: {x: -0.000000022351742, y: 3.745745e-11, z: 1.6619102e-11, w: 1}
-  m_LocalPosition: {x: -0, y: 0.0781, z: 0.1752}
+  m_LocalPosition: {x: 0, y: 0.097, z: 0.138}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3879,7 +3879,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6092361150268814991
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3928,7 +3928,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 03a1b7d472d54af4585cb0056585cf46, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b0501c9c678f2fa4bbe831fe3f8b2bde, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4942,9 +4942,11 @@ MonoBehaviour:
   syncInterval: 0.1
   health: 0
   maxHealth: 100
-  bloodSplatter: {fileID: 4893204386987473994}
   frontHealthBar: {fileID: 4530816192007440679}
   backHealthBar: {fileID: 7697062139774292509}
+  overlay: {fileID: 4893204386987473994}
+  duration: 2
+  fadeSpeed: 1.5
 --- !u!114 &2226921498386319334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5468,7 +5470,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9064463684496626759}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: mixamorig:Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}

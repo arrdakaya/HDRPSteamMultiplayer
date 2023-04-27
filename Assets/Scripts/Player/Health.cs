@@ -1,5 +1,4 @@
 using Mirror;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,16 +10,23 @@ public class Health : NetworkBehaviour
     [SyncVar][SerializeField] private float health;
     [SerializeField] private float maxHealth = 100f;
 
-    [SerializeField] private Image bloodSplatter;
-
+    [Header("Health Bar")]
     public Image frontHealthBar;
     public Image backHealthBar;
     private float chipSpeed = 2f;
     private float lerpTimer;
 
+    [Header("Damage Overlay")]
+    [SerializeField] private Image overlay;
+    [SerializeField] private float duration;
+    [SerializeField] private float fadeSpeed;
+    private float durationTimer;
+
+
     private void Start()
     {
         health = maxHealth;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
     }
     private void Update()
     {
@@ -32,6 +38,19 @@ public class Health : NetworkBehaviour
             {
                 RestoreHealth(30);
             }
+            if(overlay.color.a > 0)
+            {
+                if (health < 20)
+                    return;
+                durationTimer += Time.deltaTime;
+                if(durationTimer > duration)
+                {
+                    float tempAlpha = overlay.color.a;
+                    tempAlpha -= Time.deltaTime * fadeSpeed;
+                    overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, tempAlpha);
+
+                }
+            }
         }
     
     }
@@ -41,8 +60,8 @@ public class Health : NetworkBehaviour
         
         health -= damage;
         lerpTimer = 0f;
-        StartCoroutine("ShowBlood");
-       
+        durationTimer = 0;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
     }
 
     public void RestoreHealth(float healAmount)
@@ -56,18 +75,18 @@ public class Health : NetworkBehaviour
         }
        
     }
-    IEnumerator ShowBlood()
-    {
-        bloodSplatter.gameObject.SetActive(true);
-        Color bloodSplatterColor = bloodSplatter.color;
-        bloodSplatterColor.a = 1;
-        bloodSplatter.color = bloodSplatterColor;
-        yield return new WaitForSeconds(1);
-        bloodSplatterColor.a = 0;
-        bloodSplatter.color = bloodSplatterColor;
-        bloodSplatter.gameObject.SetActive(false);
+    //IEnumerator ShowBlood()
+    //{
+    //    bloodSplatter.gameObject.SetActive(true);
+    //    Color bloodSplatterColor = bloodSplatter.color;
+    //    bloodSplatterColor.a = 1;
+    //    bloodSplatter.color = bloodSplatterColor;
+    //    yield return new WaitForSeconds(1);
+    //    bloodSplatterColor.a = 0;
+    //    bloodSplatter.color = bloodSplatterColor;
+    //    bloodSplatter.gameObject.SetActive(false);
 
-    }
+    //}
     void UpdateHealtUI()
     {
         float fillF = frontHealthBar.fillAmount;

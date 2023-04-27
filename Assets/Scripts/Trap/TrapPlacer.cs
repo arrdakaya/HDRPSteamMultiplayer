@@ -1,5 +1,4 @@
 using Mirror;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +6,8 @@ public class TrapPlacer : NetworkBehaviour
 {
     public static TrapPlacer instance;
     private bool groundTrapCreated;
+    Ray ray;
+    RaycastHit hitInfo;
 
     public LayerMask layerMask;
     public LayerMask trapMask;
@@ -70,8 +71,7 @@ public class TrapPlacer : NetworkBehaviour
     {
         if(isLocalPlayer)
         {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfo;
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             //place ground trap object
             if (Physics.Raycast(ray, out hitInfo, distance, trapMask))
@@ -162,10 +162,7 @@ public class TrapPlacer : NetworkBehaviour
         }
     }
     void ManageObjectBlueprint()
-    {
-       
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfo;
+    {        
         if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
         {
             if (hitInfo.collider.CompareTag("Ground"))
@@ -184,8 +181,9 @@ public class TrapPlacer : NetworkBehaviour
 
 
                     //}
+                    
 
-                    previewObject.transform.position = new Vector3(hitInfo.point.x,  previewObject.transform.position.y, hitInfo.point.z);
+                    previewObject.transform.position = new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
                     previewObject.transform.rotation = hitInfo.transform.rotation;
 
 
@@ -317,28 +315,32 @@ public class TrapPlacer : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1) && isCooldown == false)
         {
-            if(previewObject == null)
+            if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
             {
-                previewObject = (GameObject)Instantiate(blueprint);
-                publicTrapNumber = 1;
+                if (hitInfo.collider.CompareTag("Ground"))
+                {
+                    if (previewObject == null)
+                    {
 
-            }
-            else if ( previewObject != null)
-            {
-                Destroy(previewObject);
-                previewObject = (GameObject)Instantiate(blueprint);
+                        previewObject = (GameObject)Instantiate(blueprint);
+                        publicTrapNumber = 1;
+                       
+                    }
+                    else if (previewObject != null)
+                    {
+                        Destroy(previewObject);
+                        previewObject = (GameObject)Instantiate(blueprint);
 
-                publicTrapNumber = 1;
+                        publicTrapNumber = 1;
 
-                isOverlapping = false;
-                FailText.SetActive(false);
-
-            }
-            if (previewObject != null)
-            {
-                isPlacingObject = true;
-            }
-
+                        isOverlapping = false;
+                        FailText.SetActive(false);
+                    }
+                    if (previewObject != null)
+                    {
+                        isPlacingObject = true;
+                    }
+            }   }
         }
 
 
@@ -347,28 +349,31 @@ public class TrapPlacer : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha2) && isCooldown2 == false)
         {
-            if(previewObject == null)
+            if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
             {
-                previewObject = (GameObject)Instantiate(blueprint2);
-                publicTrapNumber = 2;
-        
+                if (hitInfo.collider.CompareTag("Ground"))
+                {
+                    if (previewObject == null)
+                    {
+                        previewObject = (GameObject)Instantiate(blueprint2);
+                        publicTrapNumber = 2;
 
-            }
-            else if (previewObject != null)
-            {
-                Destroy(previewObject);
-                previewObject = (GameObject)Instantiate(blueprint2);
+                    }
+                    else if (previewObject != null)
+                    {
+                        Destroy(previewObject);
+                        previewObject = (GameObject)Instantiate(blueprint2);
 
-                publicTrapNumber = 2;
-                isOverlapping = false;
-                FailText.SetActive(false);
-
-            }
-            if (previewObject != null)
-            {
-                isPlacingObject = true;
-            }
-
+                        publicTrapNumber = 2;
+                        isOverlapping = false;
+                        FailText.SetActive(false);
+                    }
+                    if (previewObject != null)
+                    {
+                        isPlacingObject = true;
+                    }
+                }
+            }   
         }
 
 
@@ -377,26 +382,29 @@ public class TrapPlacer : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha3) && isCooldown3 == false)
         {
-            if (previewObject == null)
+            if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
             {
-                previewObject = (GameObject)Instantiate(teleportBlueprint);
-                publicTrapNumber = 3;
-              
+                if (hitInfo.collider.CompareTag("Ground"))
+                {
+                    if (previewObject == null)
+                    {
+                        previewObject = (GameObject)Instantiate(teleportBlueprint);
+                        publicTrapNumber = 3;
+                    }
+                    else if (previewObject != null)
+                    {
+                        Destroy(previewObject);
+                        previewObject = (GameObject)Instantiate(teleportBlueprint);
+                        publicTrapNumber = 3;
+                        isOverlapping = false;
+                        FailText.SetActive(false);
+                    }
+                    if (previewObject != null)
+                    {
+                        isPlacingObject = true;
+                    }
+                }
             }
-            else if (previewObject != null)
-            {
-                Destroy(previewObject);
-                previewObject = (GameObject)Instantiate(teleportBlueprint);
-                publicTrapNumber = 3;
-                isOverlapping = false;
-                FailText.SetActive(false);
-
-            }
-            if (previewObject != null)
-            {
-                isPlacingObject = true;
-            }
-
         }
 
 

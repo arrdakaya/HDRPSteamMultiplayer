@@ -292,14 +292,6 @@ public class PlayerMovementController : NetworkBehaviour
         }
     }
 
-    void SetPosition()
-    {
-        Debug.Log("Set position");
-        Debug.Log(transform.position);
-
-        transform.position = new Vector3(0, 5,0);
-        Debug.Log(transform.position);
-
-    }
+   
 
 }
