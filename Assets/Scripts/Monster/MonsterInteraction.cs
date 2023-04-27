@@ -41,11 +41,17 @@ public class MonsterInteraction : NetworkBehaviour
                 doorMessageObj.SetActive(true);
                 doorMessage.text = hit.transform.gameObject.GetComponent<DoorType>().message;
 
+                if (hit.transform.gameObject.GetComponent<DoorType>().locked == true)
+                {
+                    doorMessage.text = "Locked. You Can Pass Through";
+                }
 
                 if (Input.GetKeyDown(KeyCode.E) && hit.transform.gameObject.GetComponent<DoorType>().locked == false)
                 {
                     audioPlayer.clip = pickupSounds[0];
                     audioPlayer.Play();
+
+                    
 
                     if (hit.transform.gameObject.GetComponent<DoorType>().opened == false)
                     {
