@@ -349,6 +349,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 44573488358854456, guid: d57fc35075a1f1f41b2fb5d9fcc7fcc9, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+    - target: {fileID: 44573488358854456, guid: d57fc35075a1f1f41b2fb5d9fcc7fcc9, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+    - target: {fileID: 44573488358854456, guid: d57fc35075a1f1f41b2fb5d9fcc7fcc9, type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+    - target: {fileID: 44573488358854456, guid: d57fc35075a1f1f41b2fb5d9fcc7fcc9, type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
     - target: {fileID: 1894516631364513428, guid: d57fc35075a1f1f41b2fb5d9fcc7fcc9, type: 3}
       propertyPath: sceneId
       value: 2037253974
@@ -18657,7 +18673,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 50
     distanceFadeEnd: 60
-    textureOffset: {x: -0, y: -0, z: -0}
+    textureOffset: {x: 0, y: 0, z: 0}
     falloffMode: 0
   m_Version: 2
 --- !u!1001 &1504255721
