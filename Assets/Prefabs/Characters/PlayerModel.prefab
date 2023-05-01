@@ -698,7 +698,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Press E to open door.
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4754,6 +4754,7 @@ GameObject:
   - component: {fileID: 3222843356587427792}
   - component: {fileID: 2994746519079327002}
   - component: {fileID: 7548355274639756164}
+  - component: {fileID: 1241598845653297476}
   m_Layer: 7
   m_Name: PlayerModel
   m_TagString: Player
@@ -5190,6 +5191,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1241598845653297476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805489786869438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1664f8ea11422de4ca6df481fd77aeec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  playerCamera: {fileID: 880736548800978516}
 --- !u!1 &7808066572183204106
 GameObject:
   m_ObjectHideFlags: 0

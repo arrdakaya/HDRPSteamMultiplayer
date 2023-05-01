@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 using Unity.VisualScripting;
+using System.Collections;
 
 public class PlayerPickUp : NetworkBehaviour
 {
@@ -38,8 +39,9 @@ public class PlayerPickUp : NetworkBehaviour
     private void Update()
     {
         if (!isLocalPlayer) return;
+        if (Camera.main == null) return;
+        
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
 
         if (Physics.Raycast(ray, out hit, 2, includeLayer))
         {
@@ -115,6 +117,55 @@ public class PlayerPickUp : NetworkBehaviour
                     }
                 }
             }
+            else if (hit.transform.gameObject.CompareTag("PasswordDoor"))
+            {
+                SaveScript.doorObject = hit.transform.gameObject;
+                objID = (int)hit.transform.gameObject.GetComponent<DoorType>().chooseDoor;
+                doorMessageObj.SetActive(true);
+                doorMessage.text = hit.transform.gameObject.GetComponent<DoorType>().message;
+
+                GameObject myDoor = hit.transform.gameObject;
+                if (myDoor.GetComponent<DoorType>().locked == true)
+                {
+                    doorMessage.text = "Locked. You need a password";
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        StartCoroutine("AnimatonSpeedZero");
+
+                        if (gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
+                        {
+                            myDoor.GetComponent<KeyPad>().OpenKeyUI();
+
+                        }
+
+                    }
+                }
+                if (myDoor.GetComponent<KeyPad>().isPasswordCorrect == true)
+                {
+                    myDoor.GetComponent<DoorType>().locked = false;
+                    gameObject.GetComponent<PlayerMovementController>().enabled = true;
+
+                }
+
+                if (Input.GetKeyDown(KeyCode.E) && myDoor.GetComponent<DoorType>().locked == false)
+                {
+                    audioPlayer.clip = pickupSounds[0];
+                    audioPlayer.Play();
+
+                    if (myDoor.GetComponent<DoorType>().opened == false)
+                    {
+                        myDoor.GetComponent<DoorType>().message = " Press E to close the door";
+                        myDoor.GetComponent<DoorType>().opened = true;
+                        myDoor.GetComponent<Animator>().SetTrigger("Open");
+                    }
+                    else if (myDoor.GetComponent<DoorType>().opened == true)
+                    {
+                        myDoor.GetComponent<DoorType>().message = " Press E to open the door";
+                        myDoor.GetComponent<DoorType>().opened = false;
+                        myDoor.GetComponent<Animator>().SetTrigger("Close");
+                    }
+                }
+            }
 
         }
         else
@@ -136,6 +187,7 @@ public class PlayerPickUp : NetworkBehaviour
         }
     }
         
+   
 
     private void Pickup()
     {
@@ -156,6 +208,13 @@ public class PlayerPickUp : NetworkBehaviour
         currentWeapon = null;
         }
     }           
+  
+    IEnumerator AnimatonSpeedZero()
+    {
+        gameObject.GetComponent<PlayerMovementController>().AnimationValueZero();
+        yield return new WaitForSeconds(1);
+        gameObject.GetComponent<PlayerMovementController>().enabled = false;
+    }
               
     [Command(requiresAuthority = false)]
     void CmdDestroyItem(GameObject obj)

@@ -5,14 +5,15 @@ public class DoorType : MonoBehaviour
 {
     public enum typeOfDoor
     {
-        room
+        room,
+        passwordDoor
     }
     public typeOfDoor chooseDoor;
 
     public bool opened = false;
     public bool locked = false;
     [HideInInspector]
-    public string message = "Press E to open the door";
+    public string message = "";
     private Animator anim;
 
     // Start is called before the first frame update

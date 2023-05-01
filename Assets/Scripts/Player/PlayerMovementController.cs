@@ -248,26 +248,9 @@ public class PlayerMovementController : NetworkBehaviour
             transform.Rotate(Vector3.up, Mouse_X * MouseSensitivity * Time.deltaTime);
   
         }
-
-
-
-        //CMDCameraRotation(_xRotation);
  
     }
-    //[Command]
-    //void CMDCameraRotation(float _xRotation)
-    //{
-    //    RPCCameraRotation(_xRotation);
-    //}
-    //[ClientRpc]
-    //void RPCCameraRotation(float _xRotation)
-    //{
-    //    if (!isLocalPlayer)
-    //    {
-    //        Camera.transform.localRotation = Quaternion.Euler(_xRotation, 0, 0);
-
-    //    }
-    //}
+ 
    
     [Command]
     private void OnAnimatorIK()
@@ -291,7 +274,11 @@ public class PlayerMovementController : NetworkBehaviour
             target.position = raycastHit.point;
         }
     }
-
+    public void AnimationValueZero()
+    {
+        velocityX = 0.0f;
+        velocityZ = 0.0f;
+    }
    
 
 }

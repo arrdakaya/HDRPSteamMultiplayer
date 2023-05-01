@@ -33,7 +33,7 @@ public class MonsterInteraction : NetworkBehaviour
 
         if (Physics.Raycast(ray, out hit, 2, includeLayer))
         {
-            if (hit.transform.gameObject.CompareTag("Door"))
+            if (hit.transform.gameObject.CompareTag("Door") && hit.transform.gameObject.CompareTag("PasswordDoor"))
             {
                 Debug.Log(hit.transform.gameObject);
                 SaveScript.doorObject = hit.transform.gameObject;
@@ -67,6 +67,8 @@ public class MonsterInteraction : NetworkBehaviour
                     }
                 }
             }
+
+
         }
         else
         {

@@ -6,39 +6,82 @@ using UnityEngine.UI;
 
 public class KeyPad : MonoBehaviour
 {
-    [SerializeField] GameObject Door;
-    [SerializeField] GameObject KeypadUI;
+    public GameObject KeypadUI;
     [SerializeField] string password;
     [SerializeField] TextMeshProUGUI passwordText;
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
+    public bool isPasswordCorrect = false;
 
     public void OpenKeyUI()
     {
         KeypadUI.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible= true;
+    }
+    public void CloseKeyUI()
+    {
+        KeypadUI.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     public void KeyButton(string key)
     {
-        passwordText.text = passwordText + key;
+        if(passwordText.text.Length < 5)
+        {
+            passwordText.text = passwordText.text + key;
+        }
     }
     public void ResetPassword()
     {
+        if(passwordText.text.Length == 0)
+        {
+            passwordText.text = "";
+        }
+        else
+        {
+            if(!isPasswordCorrect) 
+            {
+                StartCoroutine("WrongPassword");
+
+            }
+            else
+            {
+                passwordText.text = "";
+            }
+
+        }
+    }
+    public void RedButton()
+    {
         passwordText.text = "";
+
     }
     public void CheckPassword()
     {
         if(passwordText.text == password)
         {
-            KeypadUI.SetActive(false);
-            ResetPassword();
+            StartCoroutine("CorrectPassword");
         }
         else
         {
+            isPasswordCorrect = false;
             ResetPassword();
             
         }
+    }
+    IEnumerator WrongPassword()
+    {
+        passwordText.text = "Incorrect";
+        yield return new WaitForSeconds(1);
+        passwordText.text = "";
+    }
+
+    IEnumerator CorrectPassword()
+    {
+        isPasswordCorrect = true;
+        passwordText.text = "Correct";
+        yield return new WaitForSeconds(1);
+        CloseKeyUI();
+        ResetPassword();
+
     }
 }

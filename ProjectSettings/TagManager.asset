@@ -16,6 +16,7 @@ TagManager:
   - Door
   - Weapon
   - PlayerWeapon
+  - PasswordDoor
   layers:
   - Default
   - TransparentFX

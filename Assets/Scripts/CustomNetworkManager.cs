@@ -11,7 +11,7 @@ public class CustomNetworkManager : NetworkManager
     public List<PlayerObjectController> myPlayer;
     PlayerObjectController GamePlayerInstance;
     public List<PlayerObjectController> GamePlayers { get; } = new List<PlayerObjectController>();
-    List<PlayerObjectController> players = new List<PlayerObjectController>();
+    public List<PlayerObjectController> players = new List<PlayerObjectController>();
 
     
 
