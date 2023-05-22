@@ -77,9 +77,7 @@ public class CutsceneManager : NetworkBehaviour
 
     IEnumerator CutsceneFinish(GameObject other)
     {
-        other.GetComponent<PlayerMovementController>().AnimationValueZero();
-        yield return new WaitForSeconds(1);
-        other.GetComponent<PlayerMovementController>().enabled = false;
+        other.GetComponent<PlayerMovementController>().canMove = false;
 
         yield return new WaitForSeconds(5);
         if (timelineCamera != null)
@@ -93,7 +91,8 @@ public class CutsceneManager : NetworkBehaviour
                 Manager.players[i].GetComponent<CameraController>().EnableCamera();
             }
         }
-        other.GetComponent<PlayerMovementController>().enabled = true;
+        other.GetComponent<PlayerMovementController>().canMove = true;
+
 
         Destroy(gameObject);
     }

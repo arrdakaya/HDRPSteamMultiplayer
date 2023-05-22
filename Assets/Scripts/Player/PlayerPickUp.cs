@@ -31,6 +31,8 @@ public class PlayerPickUp : NetworkBehaviour
     public TextMeshProUGUI doorMessage;
     public AudioClip[] pickupSounds;
 
+    GameObject myDoor;
+
     private void Start()
     {
         audioPlayer = GetComponent<AudioSource>();
@@ -124,18 +126,19 @@ public class PlayerPickUp : NetworkBehaviour
                 doorMessageObj.SetActive(true);
                 doorMessage.text = hit.transform.gameObject.GetComponent<DoorType>().message;
 
-                GameObject myDoor = hit.transform.gameObject;
+                myDoor = hit.transform.gameObject;
                 if (myDoor.GetComponent<DoorType>().locked == true)
                 {
                     doorMessage.text = "Locked. You need a password";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
-                        StartCoroutine("AnimatonSpeedZero");
+                        gameObject.GetComponent<PlayerMovementController>().canMove = false;
+                        gameObject.GetComponent<PlayerMovementController>().canCameraMove = false;
 
                         if (gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
                         {
                             myDoor.GetComponent<KeyPad>().OpenKeyUI();
-
+                            
                         }
 
                     }
@@ -143,7 +146,9 @@ public class PlayerPickUp : NetworkBehaviour
                 if (myDoor.GetComponent<KeyPad>().isPasswordCorrect == true)
                 {
                     myDoor.GetComponent<DoorType>().locked = false;
-                    gameObject.GetComponent<PlayerMovementController>().enabled = true;
+                    gameObject.GetComponent<PlayerMovementController>().canMove = true;
+                    gameObject.GetComponent<PlayerMovementController>().canCameraMove = true;
+
 
                 }
 
@@ -185,6 +190,16 @@ public class PlayerPickUp : NetworkBehaviour
         {
             Drop();
         }
+        if(myDoor != null)
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                myDoor.GetComponent<KeyPad>().CloseKeyUI();
+                gameObject.GetComponent<PlayerMovementController>().canMove = true;
+                gameObject.GetComponent<PlayerMovementController>().canCameraMove = true;
+
+            }
+        }
     }
         
    
@@ -209,13 +224,8 @@ public class PlayerPickUp : NetworkBehaviour
         }
     }           
   
-    IEnumerator AnimatonSpeedZero()
-    {
-        gameObject.GetComponent<PlayerMovementController>().AnimationValueZero();
-        yield return new WaitForSeconds(1);
-        gameObject.GetComponent<PlayerMovementController>().enabled = false;
-    }
-              
+   
+
     [Command(requiresAuthority = false)]
     void CmdDestroyItem(GameObject obj)
     {

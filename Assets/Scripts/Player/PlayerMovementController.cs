@@ -7,6 +7,9 @@ public class PlayerMovementController : NetworkBehaviour
     public static PlayerMovementController Instance;
     [SerializeField] GameObject Other;
 
+    public bool canMove = true;
+    public bool canCameraMove = true;
+
     private Animator anim;
     float velocityZ = 0.0f;
     float velocityX = 0.0f;
@@ -80,21 +83,31 @@ public class PlayerMovementController : NetworkBehaviour
 
             currentMaxVelocity = runPressed ? maximumRunVelocity : maximumWalkVelocity;
 
-            changeVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
-            LockOrResetVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
-
-
+            if (canMove)
+            {
+                changeVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
+                LockOrResetVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
+            
 
             anim.SetFloat(velocityZHash, velocityZ);
             anim.SetFloat(velocityXHash, velocityX);
             Move();
+            }
+            else
+            {
+                anim.SetFloat(velocityZHash, 0);
+                anim.SetFloat(velocityXHash, 0);
+            }
         }
     }
     private void LateUpdate()
     {
         if (isLocalPlayer)
         {
-            CamMovements();
+           
+                CamMovements();
+
+           
             GetMousePosition();
         }
     }
@@ -198,24 +211,26 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Move()
     {
+        
+            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+            if (isGrounded && playerVelocity.y < 0)
+                playerVelocity.y = -2f;
 
-        if (isGrounded && playerVelocity.y < 0)
-            playerVelocity.y = -2f;
+            float x = Input.GetAxis("Horizontal");
+            float z = Input.GetAxis("Vertical");
 
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+            Vector3 move = transform.right * x + transform.forward * z;
+            controller.Move(move * currentMaxVelocity * Time.deltaTime);
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * currentMaxVelocity * Time.deltaTime);
-
-        if(Input.GetButtonDown("Jump") && isGrounded)
-        {
-            playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-        playerVelocity.y += gravity * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
+            if (Input.GetButtonDown("Jump") && isGrounded)
+            {
+                playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+            playerVelocity.y += gravity * Time.deltaTime;
+            controller.Move(playerVelocity * Time.deltaTime);
+        
+        
     }
 
     // Update is called once per frame
@@ -228,27 +243,29 @@ public class PlayerMovementController : NetworkBehaviour
             var Mouse_Y = _inputManager.Look.y;
             Camera.transform.position = CameraRoot.position;
 
+        if (canCameraMove)
+        {
             _xRotation -= Mouse_Y * MouseSensitivity * Time.deltaTime;
             _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
-  
-        if(!(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S)))
-        {
-            _yRotation += Mouse_X * MouseSensitivity * Time.deltaTime;
-            _yRotation = Mathf.Clamp(_yRotation, -80, 80);
 
-            Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
+            if (!(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S)))
+            {
+                _yRotation += Mouse_X * MouseSensitivity * Time.deltaTime;
+                _yRotation = Mathf.Clamp(_yRotation, -80, 80);
 
+                Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
+
+            }
+            else
+            {
+                transform.Rotate(Vector3.up, _yRotation * MouseSensitivity * Time.deltaTime);
+
+                _yRotation = Mathf.Lerp(_yRotation, 0, Time.deltaTime * 10.0f);
+                Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
+                transform.Rotate(Vector3.up, Mouse_X * MouseSensitivity * Time.deltaTime);
+
+            }
         }
-        else 
-        {
-            transform.Rotate(Vector3.up, _yRotation * MouseSensitivity * Time.deltaTime);
-
-            _yRotation = Mathf.Lerp(_yRotation, 0, Time.deltaTime * 10.0f);
-            Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
-            transform.Rotate(Vector3.up, Mouse_X * MouseSensitivity * Time.deltaTime);
-  
-        }
- 
     }
  
    
@@ -274,11 +291,7 @@ public class PlayerMovementController : NetworkBehaviour
             target.position = raycastHit.point;
         }
     }
-    public void AnimationValueZero()
-    {
-        velocityX = 0.0f;
-        velocityZ = 0.0f;
-    }
+   
    
 
 }

@@ -5105,6 +5105,7 @@ GameObject:
   - component: {fileID: 2994746519079327002}
   - component: {fileID: 7548355274639756164}
   - component: {fileID: 1241598845653297476}
+  - component: {fileID: 6610115763178517626}
   m_Layer: 7
   m_Name: PlayerModel
   m_TagString: Player
@@ -5343,6 +5344,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   Other: {fileID: 8845736401074477499}
+  canMove: 1
+  canCameraMove: 1
   acceleration: 6
   deceleration: 6
   maximumWalkVelocity: 2
@@ -5457,7 +5460,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.501
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -5557,6 +5560,21 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerCamera: {fileID: 880736548800978516}
+--- !u!114 &6610115763178517626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805489786869438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e722ca31985f6e54e91cafa58c8ec5ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 41235f0e458298b43b7422ff62ad3d6a, type: 3}
+  - {fileID: 8300000, guid: e36556d6280ef0048b85e3896f741b69, type: 3}
 --- !u!1 &7808066572183204106
 GameObject:
   m_ObjectHideFlags: 0
@@ -6417,7 +6435,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108038271100546340, guid: d86ca2f4159e6a942abd8dfc52b38395, type: 3}
       propertyPath: m_Intensity
-      value: 14988.963
+      value: 234.46297
+      objectReference: {fileID: 0}
+    - target: {fileID: 108038271100546340, guid: d86ca2f4159e6a942abd8dfc52b38395, type: 3}
+      propertyPath: m_SpotAngle
+      value: 107.3
       objectReference: {fileID: 0}
     - target: {fileID: 108038271100546340, guid: d86ca2f4159e6a942abd8dfc52b38395, type: 3}
       propertyPath: m_AreaSize.x
@@ -6460,7 +6482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a68c43fe1f2a47cfa234b5eeaa98012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Intensity: 25995.535
+  m_Intensity: 0
   m_EnableSpotReflector: 1
   m_LuxAtDistance: 1
   m_InnerSpotPercent: 0
