@@ -4733,6 +4733,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   Other: {fileID: 283538409896465995}
+  canMove: 1
+  canCameraMove: 1
   acceleration: 6
   deceleration: 6
   maximumWalkVelocity: 2
