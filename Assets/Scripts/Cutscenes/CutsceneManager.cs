@@ -36,6 +36,9 @@ public class CutsceneManager : NetworkBehaviour
             {
                 RpcStartTimeline(other.gameObject);
             }
+            Debug.Log(playersInTrigger);
+            Debug.Log(Manager.players.Count);
+            
            
         }
     }

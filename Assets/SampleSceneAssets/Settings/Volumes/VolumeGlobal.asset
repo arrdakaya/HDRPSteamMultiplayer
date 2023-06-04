@@ -119,10 +119,10 @@ MonoBehaviour:
     m_Value: 1
   upperHemisphereLuxValue:
     m_OverrideState: 1
-    m_Value: 0.19421521
+    m_Value: 0.46607345
   upperHemisphereLuxColor:
     m_OverrideState: 1
-    m_Value: {x: 0.27741843, y: 0.37543568, z: 0.5}
+    m_Value: {x: 0.18750395, y: 0.2918189, z: 0.5}
   desiredLuxValue:
     m_OverrideState: 1
     m_Value: 25000
@@ -137,7 +137,7 @@ MonoBehaviour:
     m_Value: 0
   hdriSky:
     m_OverrideState: 1
-    m_Value: {fileID: 8900000, guid: 433b69cd38057f84bb82796761c1be49, type: 3}
+    m_Value: {fileID: 8900000, guid: 54a3a0570aebe8949bec4966f1376581, type: 3}
   distortionMode:
     m_OverrideState: 0
     m_Value: 0
@@ -490,7 +490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b24b200358312b4fa1004e2431c2f1f, type: 3}
   m_Name: ShadowsMidtonesHighlights
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   shadows:
     m_OverrideState: 1
     m_Value: {x: 0.920684, y: 0.9097123, z: 1, w: -0.58910155}
@@ -831,7 +831,7 @@ MonoBehaviour:
     m_Value: 3
   groundTint:
     m_OverrideState: 1
-    m_Value: {r: 0.09656459, g: 0.3381394, b: 0.5849056, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   groundColorTexture:
     m_OverrideState: 1
     m_Value: {fileID: 0}

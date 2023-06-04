@@ -25,9 +25,6 @@ public class PlayerMovementController : NetworkBehaviour
     private CharacterController controller;
     private Vector3 playerVelocity;
 
-    public Transform groundCheck;
-    public LayerMask groundMask;
-    float groundDistance = 0.4f;
     bool isGrounded;
 
     float jumpHeight = 3.0f;
@@ -212,7 +209,7 @@ public class PlayerMovementController : NetworkBehaviour
     private void Move()
     {
         
-            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+            isGrounded = controller.isGrounded;
 
             if (isGrounded && playerVelocity.y < 0)
                 playerVelocity.y = -2f;

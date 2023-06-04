@@ -13,10 +13,16 @@ public class TrapControl : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-           
             anim.SetTrigger("TrapTrigger");
             other.GetComponent<Health>().DecreaseHP(50);
+            StartCoroutine("TrapDestroy");
+         
         }
        
+    }
+    IEnumerator TrapDestroy()
+    {
+        yield return new WaitForSeconds(1);
+        Destroy(this.gameObject);
     }
 }
