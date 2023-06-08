@@ -37,9 +37,12 @@ public class SceneLoader : NetworkBehaviour
     [ClientRpc]
     public async void RpcLoadScene(string sceneName)
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-        asyncLoad.allowSceneActivation = false;
-        await LoadAsync(asyncLoad);
+        if (isServer)
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+            asyncLoad.allowSceneActivation = false;
+            await LoadAsync(asyncLoad);
+        }
     }
     public async Task LoadAsync(AsyncOperation asyncLoad)
     {
@@ -60,9 +63,9 @@ public class SceneLoader : NetworkBehaviour
         Debug.Log("Sahne yükleme iþlemi tamamlandý.");
         if (asyncLoad.isDone)
         {
-            Manager.SpawnPlayer();
             if (isServer)
             {
+                Manager.SpawnPlayer();
                 NetworkServer.SpawnObjects();
             }
         }
