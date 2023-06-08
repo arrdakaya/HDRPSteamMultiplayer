@@ -832,11 +832,14 @@ MonoBehaviour:
   - {fileID: 7491344734427100115, guid: dfdc94f4922256145aab3201f3aa14ba, type: 3}
   - {fileID: 4403600250576228818, guid: a3f9b224965bc95499bf08cde18e87c0, type: 3}
   - {fileID: 2363329326449116779, guid: eb3a1faf60200514cb49e8b7b1c39ff1, type: 3}
+  - {fileID: 1834844173730811686, guid: 24e3c3cc17fa26b48aacd571252e1587, type: 3}
+  - {fileID: 3246419429030741078, guid: 782d3ca7b027877458221365ea7efba6, type: 3}
   timeInterpolationGui: 0
   GamePlayerPrefab: {fileID: 8108144209026050801, guid: 95b511732a784bb4c92443a9a22d7b92, type: 3}
   myPlayer:
   - {fileID: -8814268655680521952, guid: 8af208b5ed5128545ac8383f207bf801, type: 3}
   - {fileID: 6944039443994673694, guid: 3dbb47f3590414746825e240296d9b1c, type: 3}
+  - {fileID: 8941891496637374537, guid: 24e3c3cc17fa26b48aacd571252e1587, type: 3}
   players: []
 --- !u!114 &1721786858
 MonoBehaviour:

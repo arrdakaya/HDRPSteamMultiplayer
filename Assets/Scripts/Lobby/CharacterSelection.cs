@@ -17,26 +17,15 @@ public class CharacterSelection : NetworkBehaviour
     }
     private void Start()
     {
-        selectedIndex = 0;
+        selectedIndex = 2;
     }
    
-   
-    public void SelectMonster()
+    public void SelectCharacter(int selectedIndex)
     {
-        selectedIndex = 1;
-        
-            LobbyController.Instance.LocalPlayerController.CmdPlayerSelection(selectedIndex);
-        
 
-    }
+        selectedIndex = 2;
 
-
-    public void SelectHuman()
-    {
-        
-        selectedIndex = 0;
-        
         LobbyController.Instance.LocalPlayerController.CmdPlayerSelection(selectedIndex);
-        
+
     }
 }

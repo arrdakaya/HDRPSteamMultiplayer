@@ -17,6 +17,7 @@ TagManager:
   - Weapon
   - PlayerWeapon
   - PasswordDoor
+  - AITarget
   layers:
   - Default
   - TransparentFX
