@@ -2478,7 +2478,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8183
+    m_Bits: 24567
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4739,10 +4739,6 @@ MonoBehaviour:
   deceleration: 6
   maximumWalkVelocity: 2
   maximumRunVelocity: 4
-  groundCheck: {fileID: 3666183169716065499}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 1024
   mouseLayerMask:
     serializedVersion: 2
     m_Bits: 2147483647

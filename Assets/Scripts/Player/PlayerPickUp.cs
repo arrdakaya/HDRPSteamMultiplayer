@@ -3,11 +3,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
-using Unity.VisualScripting;
-using System.Collections;
+
 
 public class PlayerPickUp : NetworkBehaviour
 {
+    public static PlayerPickUp Instance;
+
     private RaycastHit hit;
     public LayerMask includeLayer;
     public GameObject pickupPanel;
@@ -23,7 +24,7 @@ public class PlayerPickUp : NetworkBehaviour
     [Header("Weapon Features")]
     public Sprite[] weaponIcons;
     public string[] weaponTitles;
-    private GameObject currentWeapon;
+    public GameObject currentWeapon;
 
     private int objID = 0;
     private AudioSource audioPlayer;
@@ -33,6 +34,13 @@ public class PlayerPickUp : NetworkBehaviour
 
     GameObject myDoor;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
     private void Start()
     {
         audioPlayer = GetComponent<AudioSource>();
@@ -129,7 +137,7 @@ public class PlayerPickUp : NetworkBehaviour
                 myDoor = hit.transform.gameObject;
                 if (myDoor.GetComponent<DoorType>().locked == true)
                 {
-                    doorMessage.text = "Locked. You need a password";
+                    doorMessage.text = "Password Door. Press E to enter password";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
                         gameObject.GetComponent<PlayerMovementController>().canMove = false;
@@ -212,15 +220,18 @@ public class PlayerPickUp : NetworkBehaviour
         currentWeapon.transform.parent = weaponParent.transform;
         currentWeapon.transform.localEulerAngles = new Vector3(75f, 0f, -90f);
         currentWeapon.tag = "PlayerWeapon";
+        SaveScript.hasCursedObject = true;
     }
-    private void Drop()
+    public void Drop()
     {
         if (currentWeapon != null)
         {
-        currentWeapon.transform.parent = null;
-        currentWeapon.transform.GetComponent<Rigidbody>().isKinematic = false;
-        currentWeapon.tag = "Weapon";
-        currentWeapon = null;
+            currentWeapon.transform.parent = null;
+            currentWeapon.transform.GetComponent<Rigidbody>().isKinematic = false;
+            currentWeapon.tag = "Weapon";
+            currentWeapon = null;
+            SaveScript.hasCursedObject = false;
+
         }
     }           
   

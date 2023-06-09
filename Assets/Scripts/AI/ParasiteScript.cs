@@ -9,26 +9,24 @@ public class ParasiteScript : MonoBehaviour
     {
         Idle,
         Walking,
-        Eating,
         Crawling,
-        Die,
         RealDeath
 
     }
-
+    public LayerMask PlayerLayer;
 
     private NavMeshAgent agent;
     public ParasiteState chooseState;
     private Animator anim;
-    private GameObject[] targets;
     private AnimatorStateInfo animInfo;
 
-    private int currentState;
-    private float distanceToPlayer;
     public GameObject player;
     public float parasiteAlertRange = 10f;
     private bool awareOfPlayer = false;
-    private bool adding = true;
+    private float attackDistance =1.2f;
+
+    [SerializeField] private AudioSource chaseMusic;
+
 
     // Start is called before the first frame update
     void Start()
@@ -36,17 +34,18 @@ public class ParasiteScript : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         anim.SetTrigger(chooseState.ToString());
-        targets = GameObject.FindGameObjectsWithTag("AITarget");
-        player = GameObject.Find("LocalGamePlayer");
+       
         //agent.destination = targets[0].transform.position;
         anim.SetTrigger(chooseState.ToString());
-        currentState = (int)chooseState;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+
+       
         animInfo = anim.GetCurrentAnimatorStateInfo(0);
 
         if (animInfo.IsTag("motion"))
@@ -56,27 +55,82 @@ public class ParasiteScript : MonoBehaviour
                 agent.isStopped = true;
             }
         }
-        if (distanceToPlayer < parasiteAlertRange)
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, parasiteAlertRange,PlayerLayer);
+
+        float closestDistance = Mathf.Infinity;
+
+        if(colliders.Length > 0)
         {
-            chooseState = ParasiteState.Walking;
-            if(chooseState == ParasiteState.Walking)
+            foreach (var collider in colliders)
             {
-                agent.destination = player.transform.position;
-                WalkOn();
-                awareOfPlayer = true;
+                if (collider.CompareTag("Player"))
+                {
+                    float distance = Vector3.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        player = collider.gameObject;
+                        closestDistance = distance;
+                        if(closestDistance <= attackDistance)
+                        {
+                            agent.isStopped = true;
+                            anim.SetBool("Attack", true);
+
+                            Vector3 pos = (player.transform.position - transform.position).normalized;
+                            Quaternion posRotation = Quaternion.LookRotation(new Vector3(pos.x, 0, pos.z));
+                            transform.rotation = Quaternion.Slerp(transform.rotation, posRotation, 2.5f * Time.deltaTime);
+                        }
+                        else
+                        {
+                            if (player != null)
+                            {
+                                anim.SetBool("Attack", false);
+
+                                Debug.Log("Closest Player: " + player.name);
+                                chooseState = ParasiteState.Walking;
+                                if (chooseState == ParasiteState.Walking)
+                                {
+                                
+                                    agent.destination = player.transform.position;
+                                    if (chaseMusic.volume < 0.7f)
+                                    {
+                                        if (chaseMusic.isPlaying == false)
+                                        {
+                                            chaseMusic.Play();
+
+                                        }
+                                        chaseMusic.volume += 0.5f * Time.deltaTime;
+                                    }
+                                }
+                                WalkOn();
+                                awareOfPlayer = true;
+
+                            }
+                        }
+                    }
+                }
             }
         }
-       
-       
-        if(distanceToPlayer > parasiteAlertRange)
+        else if(colliders.Length < 1)
         {
+            player = null;
+          
+            if (chaseMusic.volume > 0)
+            {
+                chaseMusic.volume -= 0.5f * Time.deltaTime;
+            }
+            if (chaseMusic.volume == 0)
+            {
+                chaseMusic.Stop();
+            }
+
             awareOfPlayer = false;
             WalkOff();
         }
-       
-      
-      
+
     }
+
+
     public void WalkOn()
     {
         

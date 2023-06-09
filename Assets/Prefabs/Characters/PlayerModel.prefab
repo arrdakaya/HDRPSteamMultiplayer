@@ -1136,7 +1136,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8183
+    m_Bits: 24567
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -5075,6 +5075,7 @@ GameObject:
   - component: {fileID: 7548355274639756164}
   - component: {fileID: 1241598845653297476}
   - component: {fileID: 6610115763178517626}
+  - component: {fileID: 3239806311320753030}
   m_Layer: 7
   m_Name: PlayerModel
   m_TagString: Player
@@ -5380,6 +5381,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 8cbf682f64f77204db1adef91cf9a193, type: 3}
   weaponTitles:
   - Cursed Sword
+  currentWeapon: {fileID: 0}
   doorMessageObj: {fileID: 549300043421952279}
   doorMessage: {fileID: 498398350216953486}
   pickupSounds:
@@ -5539,6 +5541,22 @@ MonoBehaviour:
   clips:
   - {fileID: 8300000, guid: 41235f0e458298b43b7422ff62ad3d6a, type: 3}
   - {fileID: 8300000, guid: e36556d6280ef0048b85e3896f741b69, type: 3}
+--- !u!114 &3239806311320753030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805489786869438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21de1a7a680d94643b94760e48bb6f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myCamera: {fileID: 6919075909662315083}
+  EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!1 &7808066572183204106
 GameObject:
   m_ObjectHideFlags: 0

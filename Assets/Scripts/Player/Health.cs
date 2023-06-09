@@ -75,18 +75,7 @@ public class Health : NetworkBehaviour
         }
        
     }
-    //IEnumerator ShowBlood()
-    //{
-    //    bloodSplatter.gameObject.SetActive(true);
-    //    Color bloodSplatterColor = bloodSplatter.color;
-    //    bloodSplatterColor.a = 1;
-    //    bloodSplatter.color = bloodSplatterColor;
-    //    yield return new WaitForSeconds(1);
-    //    bloodSplatterColor.a = 0;
-    //    bloodSplatter.color = bloodSplatterColor;
-    //    bloodSplatter.gameObject.SetActive(false);
-
-    //}
+ 
     void UpdateHealtUI()
     {
         float fillF = frontHealthBar.fillAmount;

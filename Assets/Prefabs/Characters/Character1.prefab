@@ -1315,6 +1315,7 @@ GameObject:
   - component: {fileID: 54498174621330634}
   - component: {fileID: 8162542222211767298}
   - component: {fileID: 8334463304025377057}
+  - component: {fileID: -5788409978297457445}
   m_Layer: 7
   m_Name: Character1
   m_TagString: Player
@@ -1625,6 +1626,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 8cbf682f64f77204db1adef91cf9a193, type: 3}
   weaponTitles:
   - Cursed Sword
+  currentWeapon: {fileID: 0}
   doorMessageObj: {fileID: 683953420746804142}
   doorMessage: {fileID: 6523554244195965164}
   pickupSounds:
@@ -1653,7 +1655,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1784,6 +1786,22 @@ MonoBehaviour:
   - m_Rig: {fileID: 4993373205702207758}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &-5788409978297457445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834844173730811686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21de1a7a680d94643b94760e48bb6f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myCamera: {fileID: 4246462567592004123}
+  EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!1 &1885655035577644073
 GameObject:
   m_ObjectHideFlags: 0
@@ -4213,7 +4231,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8183
+    m_Bits: 24567
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

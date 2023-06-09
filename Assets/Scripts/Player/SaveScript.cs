@@ -8,4 +8,5 @@ public class SaveScript : MonoBehaviour
     //public static bool[] itemsPickedUp = new bool[2];
     public static int[] itemAmts = new int[4];
     public static GameObject doorObject;
+    public static bool hasCursedObject = false;
 }
