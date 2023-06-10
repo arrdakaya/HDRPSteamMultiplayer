@@ -58,7 +58,7 @@ public class PlayerMovementController : NetworkBehaviour
         if (!isLocalPlayer) { return; }
         controller = gameObject.GetComponent<CharacterController>();
         controller.enabled = false;
-        transform.position = new Vector3(Random.Range(-5, 5), 5, Random.Range(-5, 5));
+        transform.position = new Vector3(5, 5, 5);
         controller.enabled = true;
         anim = GetComponent<Animator>();
         _inputManager = GetComponent<InputManager>();
@@ -264,31 +264,31 @@ public class PlayerMovementController : NetworkBehaviour
             }
         }
     }
- 
-   
+
+
     [Command]
     private void OnAnimatorIK()
     {
         if (!anim) return;
         if (isLocalPlayer)
         {
-         
-                anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
-                Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
-                anim.SetLookAtPosition(lookAtRay.GetPoint(25));
-            
-           
+
+            anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
+            Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
+            anim.SetLookAtPosition(lookAtRay.GetPoint(25));
+
+
         }
     }
     void GetMousePosition()
     {
         Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
-        if(Physics.Raycast(ray,out RaycastHit raycastHit, 999f, mouseLayerMask))
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, mouseLayerMask))
         {
             target.position = raycastHit.point;
         }
     }
-   
-   
+
+
 
 }

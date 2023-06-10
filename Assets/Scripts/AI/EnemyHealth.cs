@@ -1,17 +1,31 @@
 using Mirror;
-
+using System.Collections;
 using UnityEngine;
-
+using UnityEngine.VFX;
 public class EnemyHealth : NetworkBehaviour
 {
     // Start is called before the first frame update
     public static EnemyHealth Instance;
+
+    private VisualEffect VFXGraph;
+    private Animator anim;
+    private SkinnedMeshRenderer skinnedMesh;
+    private Material[] skinnedMaterials;
+    private float dissolveRate = 0.0125f;
+    private float refreshRate = 0.025f;
 
     [SyncVar][SerializeField] private float health;
     private float maxHealth = 100f;
 
     private void Start()
     {
+        VFXGraph = transform.GetChild(2).GetComponent<VisualEffect>();
+        anim = GetComponent<Animator>();
+        if(skinnedMesh == null)
+        {
+            skinnedMesh = GetComponent<SkinnedMeshRenderer>();
+            skinnedMaterials = skinnedMesh.materials;
+        }
         health = maxHealth;
     }
 
@@ -33,6 +47,29 @@ public class EnemyHealth : NetworkBehaviour
     }
     public void Die()
     {
-        Debug.Log("Enemy Dead");
+        anim.SetTrigger("Die");
+        StartCoroutine(DissolveEffect());
+    }
+
+    IEnumerator DissolveEffect()
+    {
+        if(VFXGraph != null)
+        {
+            VFXGraph.Play();
+        }
+        if(skinnedMaterials.Length > 0)
+        {
+            float counter = 0;
+            while (skinnedMaterials[0].GetFloat("_DissolveAmount") < 1)
+            {
+                counter += dissolveRate;
+                for (int i = 0; i < skinnedMaterials.Length; i++)
+                {
+                    skinnedMaterials[i].SetFloat("_DissolveAmount", counter);
+                }
+                yield return new WaitForSeconds(refreshRate);
+            }
+            Destroy(this.gameObject);
+        }
     }
 }

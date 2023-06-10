@@ -4,13 +4,11 @@ using UnityEngine.AI;
 
 public class ParasiteScript : MonoBehaviour
 {
-
     public enum ParasiteState
     {
         Idle,
         Walking,
-        Crawling,
-        RealDeath
+        
 
     }
     public LayerMask PlayerLayer;
@@ -22,7 +20,6 @@ public class ParasiteScript : MonoBehaviour
 
     public GameObject player;
     public float parasiteAlertRange = 10f;
-    private bool awareOfPlayer = false;
     private float attackDistance =1.2f;
 
     [SerializeField] private AudioSource chaseMusic;
@@ -35,8 +32,7 @@ public class ParasiteScript : MonoBehaviour
         anim = GetComponent<Animator>();
         anim.SetTrigger(chooseState.ToString());
        
-        //agent.destination = targets[0].transform.position;
-        anim.SetTrigger(chooseState.ToString());
+        
         
     }
 
@@ -92,7 +88,7 @@ public class ParasiteScript : MonoBehaviour
                                 {
                                 
                                     agent.destination = player.transform.position;
-                                    if (chaseMusic.volume < 0.7f)
+                                    if (chaseMusic.volume < 0.6f)
                                     {
                                         if (chaseMusic.isPlaying == false)
                                         {
@@ -103,7 +99,6 @@ public class ParasiteScript : MonoBehaviour
                                     }
                                 }
                                 WalkOn();
-                                awareOfPlayer = true;
 
                             }
                         }
@@ -124,7 +119,6 @@ public class ParasiteScript : MonoBehaviour
                 chaseMusic.Stop();
             }
 
-            awareOfPlayer = false;
             WalkOff();
         }
 

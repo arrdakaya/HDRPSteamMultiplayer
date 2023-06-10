@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ParasiteDamage : MonoBehaviour
 {
+    private Animator anim;
+    private int CursedObjectLayerIndex;
 
-    private int damage = 35;
+    private int damage = 50;
     private float range = 10f;
     [SerializeField] private Camera myCamera;
     public LayerMask EnemyLayer;
@@ -13,8 +15,12 @@ public class ParasiteDamage : MonoBehaviour
    
     private float buttonHoldTimer = 0f;
     private float requiredHoldTime = 3f;
-   
-   
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        CursedObjectLayerIndex = anim.GetLayerIndex("CursedItem");
+    }
 
     // Update is called once per frame
     void Update()
@@ -22,14 +28,12 @@ public class ParasiteDamage : MonoBehaviour
 
         if (SaveScript.hasCursedObject == true)
         {
+            anim.SetLayerWeight(CursedObjectLayerIndex, 1f);
             RaycastHit hit;
             if (Physics.Raycast(myCamera.transform.position, myCamera.transform.forward, out hit, range, EnemyLayer))
-            {
-                Debug.Log("raycastbulducanoyu");
-
+            { 
                 if (Input.GetMouseButton(0))
                 {
-                    Debug.Log("canavarsoltuþ");
                     buttonHoldTimer += Time.deltaTime;
                     Debug.Log(buttonHoldTimer);
                     if (buttonHoldTimer >= requiredHoldTime)
@@ -39,9 +43,19 @@ public class ParasiteDamage : MonoBehaviour
                         buttonHoldTimer = 0f;
                     }
                 }
+                else
+                {
+                    buttonHoldTimer = 0f;
+                }
              
 
             }
+        
+        }
+        else
+        {
+            anim.SetLayerWeight(CursedObjectLayerIndex, 0f);
+
         }
 
 

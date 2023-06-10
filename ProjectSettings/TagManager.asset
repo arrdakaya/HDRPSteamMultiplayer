@@ -18,6 +18,7 @@ TagManager:
   - PlayerWeapon
   - PasswordDoor
   - AITarget
+  - TrapPlace
   layers:
   - Default
   - TransparentFX
