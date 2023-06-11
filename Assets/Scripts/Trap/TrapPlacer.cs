@@ -39,7 +39,7 @@ public class TrapPlacer : NetworkBehaviour
     public GameObject SkillMenu;
 
     private bool isPlayerBlind = false;
-    private GameObject blindPlayer;
+    public GameObject blindPlayer;
 
     [Header("Trap1")]
     public Image trapImage1;
@@ -60,7 +60,6 @@ public class TrapPlacer : NetworkBehaviour
     public Image blindImage;
     float cooldown4 = 10;
     bool isCooldown4 = false;
-
     private void Awake()
     {
         if(instance == null)
@@ -512,10 +511,14 @@ public class TrapPlacer : NetworkBehaviour
 
     IEnumerator BlindPlayer()
     {
-      
-        blindPlayer.GetComponent<CameraController>().BlindCamera();
+
+
+        blindPlayer.transform.GetChild(0).GetComponent<Volume>().enabled = true;
         isPlayerBlind = true;
+        yield return new WaitForSeconds(2);
+        blindPlayer.transform.GetChild(0).GetComponent<Volume>().enabled = false;
         yield return new WaitForSeconds(10);
+
         isPlayerBlind = false;
     }
 

@@ -31,17 +31,5 @@ public class CameraController : NetworkBehaviour
             playerCamera.SetActive(isLocalPlayer);
         }
     }
-    public void BlindCamera()
-    {
-        StartCoroutine(BlindPlayer());
-    }
-
-    IEnumerator BlindPlayer()
-    {
-
-        this.gameObject.transform.GetChild(0).GetComponent<Volume>().enabled = true;
-        yield return new WaitForSeconds(2);
-        this.gameObject.transform.GetChild(0).GetComponent<Volume>().enabled = false;
-
-    }
+  
 }
