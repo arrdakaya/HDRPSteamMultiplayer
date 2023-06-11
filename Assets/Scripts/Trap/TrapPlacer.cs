@@ -1,5 +1,7 @@
 using Mirror;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class TrapPlacer : NetworkBehaviour
@@ -10,14 +12,15 @@ public class TrapPlacer : NetworkBehaviour
     RaycastHit hitInfo;
 
     public LayerMask layerMask;
-    public LayerMask trapMask;
+    //public LayerMask trapMask;
+    public LayerMask PlayerLayer;
     [SerializeField] private float distance = 10f;
     private GameObject previewObject;
     public bool isPlacingObject;
 
     private int publicTrapNumber;
     private GameObject InstantiatedObject;
-    public GameObject objectToPlace;
+    public GameObject parasiteSpawn;
     public GameObject objectToPlace2;
     public GameObject placeTeleport;
     public GameObject groundTrap;
@@ -35,6 +38,9 @@ public class TrapPlacer : NetworkBehaviour
     public GameObject FailText;
     public GameObject SkillMenu;
 
+    private bool isPlayerBlind = false;
+    private GameObject blindPlayer;
+
     [Header("Trap1")]
     public Image trapImage1;
     float cooldown1 = 10;
@@ -50,6 +56,11 @@ public class TrapPlacer : NetworkBehaviour
     float cooldown3 = 20;
     bool isCooldown3 = false;
 
+    [Header("Blindness")]
+    public Image blindImage;
+    float cooldown4 = 10;
+    bool isCooldown4 = false;
+
     private void Awake()
     {
         if(instance == null)
@@ -64,6 +75,7 @@ public class TrapPlacer : NetworkBehaviour
         trapImage1.fillAmount = 0;
         trapImage2.fillAmount = 0;
         teleportImage.fillAmount = 0;
+        blindImage.fillAmount = 0;
         // Burada, yerel oyuncunun baþlangýç iþlemleri gerçekleþtirilebilir.
     }
 
@@ -73,79 +85,103 @@ public class TrapPlacer : NetworkBehaviour
         {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            //place ground trap object
-            if (Physics.Raycast(ray, out hitInfo, distance, trapMask))
+
+            if (Physics.Raycast(ray, out hitInfo, distance, PlayerLayer))
             {
-                if (previewObject == null)
+                if (Input.GetMouseButtonDown(1) && isPlayerBlind == false)
                 {
-                    if (!groundTrapCreated)
+                    if (hitInfo.collider.CompareTag("Player"))
                     {
-                        groundTrapDestroy = Instantiate(groundTrapBlueprint, new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.transform.position.z), Quaternion.identity);
-                        groundTrap.transform.position = groundTrapDestroy.transform.position;
-                        groundTrap.transform.rotation = groundTrapDestroy.transform.rotation;
-                        groundTrapCreated = true;
-
-                    }
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        destroyGroundTrapBlueprint = hitInfo.transform.gameObject;
-                        PlaceGroundTrap(destroyGroundTrapBlueprint);
-                        isPlacingObject = false;
-
+                        if (!isCooldown4)
+                        {
+                            blindPlayer = hitInfo.transform.gameObject;
+                            isCooldown4 = true;
+                            blindImage.fillAmount = 1;
+                            StartCoroutine(BlindPlayer());
+                        }
+                       
                     }
                 }
-
-
+               
             }
-            else
-            {
-                Destroy(groundTrapDestroy);
-                groundTrapCreated = false;
-            }
-
-        if (Input.GetMouseButtonDown(0) && isPlacingObject)
-        {
-            if (!isOverlapping)
-            {
+    
                 FailText.SetActive(false);
                 if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
                 {
-                        if (hitInfo.collider.CompareTag("Ground"))
+                    if (!isOverlapping)
+                    {
+
+                        if (Input.GetMouseButtonDown(0))
                         {
-                            Debug.Log(hitInfo.collider);
-                            Quaternion hitRotation = hitInfo.transform.rotation;
-                            PlaceObject(hitInfo.point, hitRotation);
+                            if (isPlacingObject)
+                            {
+                                if (hitInfo.collider.CompareTag("Ground"))
+                                {
+                                    Quaternion hitRotation = hitInfo.transform.rotation;
+                                    PlaceObject(hitInfo.point, hitRotation);
 
-                            if (publicTrapNumber == 1)
-                            {
-                                isCooldown = true;
-                                trapImage1.fillAmount = 1;
-                            }
-                            else if (publicTrapNumber == 2)
-                            {
-                                isCooldown2 = true;
-                                trapImage2.fillAmount = 1;
-                            }
-                            else if (publicTrapNumber == 3)
-                            {
-                                isCooldown3 = true;
-                                teleportImage.fillAmount = 1;
+                                    if (publicTrapNumber == 1)
+                                    {
+                                        isCooldown = true;
+                                        trapImage1.fillAmount = 1;
+                                    }
+                                    else if (publicTrapNumber == 2)
+                                    {
+                                        isCooldown2 = true;
+                                        trapImage2.fillAmount = 1;
+                                    }
+                                    else if (publicTrapNumber == 3)
+                                    {
+                                        isCooldown3 = true;
+                                        teleportImage.fillAmount = 1;
+                                    }
+                                    
+
+                                    if (hitInfo.collider.name == "Plane" || hitInfo.collider.name == "Sphere")
+                                        isPlacingObject = false;
+                                }
                             }
 
-                            if (hitInfo.collider.name == "Plane" || hitInfo.collider.name == "Sphere")
-                                isPlacingObject = false;
                         }
-                   
-                        
+
+                    }
+                    if (hitInfo.collider.CompareTag("GroundTrap"))
+                    {
+                        if (previewObject == null)
+                        {
+                            if (!groundTrapCreated)
+                            {
+                                groundTrapDestroy = Instantiate(groundTrapBlueprint, new Vector3(hitInfo.transform.position.x, hitInfo.transform.position.y, hitInfo.transform.position.z), Quaternion.identity);
+                                groundTrap.transform.position = groundTrapDestroy.transform.position;
+                                groundTrap.transform.rotation = groundTrapDestroy.transform.rotation;
+                                groundTrapCreated = true;
+
+                            }
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                destroyGroundTrapBlueprint = hitInfo.transform.gameObject;
+                                PlaceGroundTrap(destroyGroundTrapBlueprint);
+                                isPlacingObject = false;
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Destroy(groundTrapDestroy);
+                        groundTrapCreated = false;
+                    }
+
+
                 }
-            }
+            
             else
             {
                 FailText.SetActive(true);
 
             }
 
-        }
+        
         
         if (isPlacingObject)
         {
@@ -153,12 +189,13 @@ public class TrapPlacer : NetworkBehaviour
             ManageObjectBlueprint();
 
         }
-        Trap1();
-        Trap2();
-        Teleport();
-        Trap1Cooldown();
-        Trap2Cooldown();
-        TeleportCooldown();
+            Trap1();
+            Trap2();
+            Teleport();
+            Trap1Cooldown();
+            Trap2Cooldown();
+            TeleportCooldown();
+            BlindnessCooldown();
         }
     }
     void ManageObjectBlueprint()
@@ -270,7 +307,7 @@ public class TrapPlacer : NetworkBehaviour
         if (isServer) 
         {
 
-            InstantiatedObject = Instantiate(objectToPlace, new Vector3(position.x, position.y + objectToPlace.transform.position.y, position.z), hitRotation);
+            InstantiatedObject = Instantiate(parasiteSpawn, new Vector3(position.x, position.y + parasiteSpawn.transform.position.y, position.z), hitRotation);
                 NetworkServer.Spawn(InstantiatedObject);
 
         }
@@ -409,6 +446,8 @@ public class TrapPlacer : NetworkBehaviour
 
 
     }
+   
+
     void Trap1Cooldown()
     {
         
@@ -453,12 +492,32 @@ public class TrapPlacer : NetworkBehaviour
                     isCooldown3 = false;
 
             }
-        }
+    }
         
         
     }
+    void BlindnessCooldown()
+    {
+        if (isCooldown4)
+        {
+            blindImage.fillAmount -= 1 / cooldown4 * Time.deltaTime;
+            if (blindImage.fillAmount <= 0)
+            {
+                blindImage.fillAmount = 0;
+                isCooldown4 = false;
 
+            }
+        }
+    }
 
+    IEnumerator BlindPlayer()
+    {
+      
+        blindPlayer.GetComponent<CameraController>().BlindCamera();
+        isPlayerBlind = true;
+        yield return new WaitForSeconds(10);
+        isPlayerBlind = false;
+    }
 
 }
 

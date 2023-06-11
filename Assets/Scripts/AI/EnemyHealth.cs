@@ -1,12 +1,12 @@
 using Mirror;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.VFX;
 public class EnemyHealth : NetworkBehaviour
 {
     // Start is called before the first frame update
-    public static EnemyHealth Instance;
-
+    private NavMeshAgent agent;
     private VisualEffect VFXGraph;
     private Animator anim;
     private SkinnedMeshRenderer skinnedMesh;
@@ -17,8 +17,10 @@ public class EnemyHealth : NetworkBehaviour
     [SyncVar][SerializeField] private float health;
     private float maxHealth = 100f;
 
+
     private void Start()
     {
+        agent = GetComponent<NavMeshAgent>();
         VFXGraph = transform.GetChild(2).GetComponent<VisualEffect>();
         anim = GetComponent<Animator>();
         if(skinnedMesh == null)
@@ -47,13 +49,15 @@ public class EnemyHealth : NetworkBehaviour
     }
     public void Die()
     {
+        gameObject.GetComponent<ParasiteScript>().enabled = false;
         anim.SetTrigger("Die");
         StartCoroutine(DissolveEffect());
     }
 
     IEnumerator DissolveEffect()
     {
-        if(VFXGraph != null)
+        agent.isStopped = true;
+        if (VFXGraph != null)
         {
             VFXGraph.Play();
         }
@@ -68,8 +72,9 @@ public class EnemyHealth : NetworkBehaviour
                     skinnedMaterials[i].SetFloat("_DissolveAmount", counter);
                 }
                 yield return new WaitForSeconds(refreshRate);
+               
+
             }
-            Destroy(this.gameObject);
         }
     }
 }

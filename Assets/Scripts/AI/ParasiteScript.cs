@@ -4,6 +4,8 @@ using UnityEngine.AI;
 
 public class ParasiteScript : MonoBehaviour
 {
+    public static ParasiteScript instance;
+
     public enum ParasiteState
     {
         Idle,
@@ -24,6 +26,12 @@ public class ParasiteScript : MonoBehaviour
 
     [SerializeField] private AudioSource chaseMusic;
 
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -74,7 +82,7 @@ public class ParasiteScript : MonoBehaviour
 
                             Vector3 pos = (player.transform.position - transform.position).normalized;
                             Quaternion posRotation = Quaternion.LookRotation(new Vector3(pos.x, 0, pos.z));
-                            transform.rotation = Quaternion.Slerp(transform.rotation, posRotation, 2.5f * Time.deltaTime);
+                            transform.rotation = Quaternion.Slerp(transform.rotation, posRotation, 5f * Time.deltaTime);
                         }
                         else
                         {

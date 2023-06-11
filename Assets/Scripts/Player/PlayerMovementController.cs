@@ -58,7 +58,7 @@ public class PlayerMovementController : NetworkBehaviour
         if (!isLocalPlayer) { return; }
         controller = gameObject.GetComponent<CharacterController>();
         controller.enabled = false;
-        transform.position = new Vector3(5, 5, 5);
+        transform.position = new Vector3(Random.Range(0,-25), 5, Random.Range(0,-11));
         controller.enabled = true;
         anim = GetComponent<Animator>();
         _inputManager = GetComponent<InputManager>();

@@ -22,10 +22,6 @@ public class CharacterSelection : NetworkBehaviour
    
     public void SelectCharacter(int selectedIndex)
     {
-
-        selectedIndex = 2;
-
         LobbyController.Instance.LocalPlayerController.CmdPlayerSelection(selectedIndex);
-
     }
 }

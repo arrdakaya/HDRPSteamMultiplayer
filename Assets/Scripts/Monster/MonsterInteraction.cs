@@ -84,7 +84,6 @@ public class MonsterInteraction : NetworkBehaviour
     {
 
         // Check if the collider belongs to the "Pickup" layer
-        Debug.Log(hit.collider.gameObject.layer);
         
             if (hit.gameObject.CompareTag("Door"))
             {
