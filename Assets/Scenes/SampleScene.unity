@@ -9303,6 +9303,10 @@ PrefabInstance:
       propertyPath: sceneId
       value: 3684219592
       objectReference: {fileID: 0}
+    - target: {fileID: 7375847592368282626, guid: 26da432b37e158f47a1f14bc35796afc, type: 3}
+      propertyPath: sceneId
+      value: 39329795
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26da432b37e158f47a1f14bc35796afc, type: 3}
 --- !u!1 &701791698
@@ -10550,6 +10554,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6115166106133567123, guid: be17c315bf8199b489013d93a9bd519c, type: 3}
+      propertyPath: sceneId
+      value: 2860765832
+      objectReference: {fileID: 0}
     - target: {fileID: 2504318489011666798, guid: be17c315bf8199b489013d93a9bd519c, type: 3}
       propertyPath: sceneId
       value: 144041287
@@ -18690,7 +18698,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 50
     distanceFadeEnd: 60
-    textureOffset: {x: -0, y: -0, z: -0}
+    textureOffset: {x: 0, y: 0, z: 0}
     falloffMode: 0
   m_Version: 2
 --- !u!1001 &1504255721
@@ -24208,6 +24216,7 @@ GameObject:
   - component: {fileID: 1782561449}
   - component: {fileID: 1782561448}
   - component: {fileID: 1782561447}
+  - component: {fileID: 1782561450}
   m_Layer: 5
   m_Name: Timer
   m_TagString: Untagged
@@ -24247,6 +24256,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6c372b665b32ce4eb5340963659085f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
   timeText: {fileID: 1782561448}
 --- !u!114 &1782561448
 MonoBehaviour:
@@ -24345,6 +24357,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1782561445}
   m_CullTransparentMesh: 1
+--- !u!114 &1782561450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782561445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 1544619042
+  _assetId: 0
+  serverOnly: 0
+  visible: 0
+  hasSpawned: 0
 --- !u!1001 &1785302677
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30613,6 +30642,10 @@ PrefabInstance:
     - target: {fileID: 6639430846922888772, guid: b831ff5e0c2d5474595dad56ae83ee76, type: 3}
       propertyPath: m_Name
       value: GlassCase_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 6639430846922888772, guid: b831ff5e0c2d5474595dad56ae83ee76, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7672065538470372439, guid: b831ff5e0c2d5474595dad56ae83ee76, type: 3}
       propertyPath: m_RootOrder

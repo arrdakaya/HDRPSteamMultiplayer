@@ -6,14 +6,16 @@ using Steamworks;
 
 public class CustomNetworkManager : NetworkManager
 {
-
+    
     [SerializeField] private PlayerObjectController GamePlayerPrefab;
     public List<PlayerObjectController> myPlayer;
     PlayerObjectController GamePlayerInstance;
+    PlayerObjectController gameplayerInstance;
     public List<PlayerObjectController> GamePlayers { get; } = new List<PlayerObjectController>();
     public List<PlayerObjectController> players = new List<PlayerObjectController>();
+    public int playerCount = 0;
+    public GameObject objectSpawner;
 
-    
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
@@ -26,37 +28,63 @@ public class CustomNetworkManager : NetworkManager
             GamePlayerInstance.PlayerIdNumber = GamePlayers.Count + 1;
             GamePlayerInstance.PlayerSteamID = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.Instance.CurrentLobbyID, GamePlayers.Count);
             NetworkServer.AddPlayerForConnection(conn, GamePlayerInstance.gameObject);
+
+            playerCount++;
+        }
+    }
+  
+    
+    public override void ServerChangeScene(string newSceneName)
+    {
+        if(SceneManager.GetActiveScene().name == "Lobby" && newSceneName.StartsWith("EarlyMapDesign"))
+        {
+            
+            for (int i = playerCount - 1; i >= 0; i--)
+            {
+                var conn = GamePlayers[i].connectionToClient;
+                gameplayerInstance = Instantiate(myPlayer[GamePlayers[i].PlayerSelectedCharacter], new Vector3(Random.Range(0, -25), 10, Random.Range(0, -11)), Quaternion.identity);
+                gameplayerInstance.ConnectionID = GamePlayers[i].ConnectionID;
+                gameplayerInstance.PlayerIdNumber = GamePlayers.Count;
+                gameplayerInstance.PlayerSteamID = GamePlayers[i].PlayerSteamID;
+                gameplayerInstance.PlayerName = GamePlayers[i].PlayerName;
+                gameplayerInstance.PlayerSelectedCharacter = GamePlayers[i].PlayerSelectedCharacter;
+                gameplayerInstance.lobbyID = GamePlayers[i].lobbyID;
+                NetworkServer.Destroy(conn.identity.gameObject);
+                NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject, true);
+                players.Add(gameplayerInstance);
+
+            }
             
            
+        }
+       
+            NetworkServer.SpawnObjects();
+            base.ServerChangeScene(newSceneName);
+
+    }
+
+    public override void OnServerSceneChanged(string sceneName)
+    {
+        if (sceneName.StartsWith("EarlyMapDesign"))
+        {
+            GameObject objectSpawnSystem = Instantiate(objectSpawner);
+            NetworkServer.Spawn(objectSpawnSystem);
         }
     }
 
 
     public void StartGame(string SceneName)
     {
-        SceneLoader.Instance.RpcLoadScene(SceneName);
-       
+        
+            ServerChangeScene(SceneName);
+
+        
+
+        //SceneLoader.Instance.RpcLoadScene(SceneName);
+
     }
-   
 
-   
 
-    public void SpawnPlayer()
-    {
-        for (int i = 0; i < GamePlayers.Count; i++)
-        {
-            players.Add(Instantiate(myPlayer[GamePlayers[i].PlayerSelectedCharacter]));
-            var conn = GamePlayers[i].connectionToClient;
-            players[i].ConnectionID = GamePlayers[i].ConnectionID;
-            players[i].PlayerIdNumber = GamePlayers.Count;
-            players[i].PlayerSteamID = GamePlayers[i].PlayerSteamID;
-            players[i].PlayerSelectedCharacter = GamePlayers[i].PlayerSelectedCharacter;
-            players[i].lobbyID = GamePlayers[i].lobbyID;
-            Destroy(GamePlayers[i].gameObject);
-            if (GamePlayers[i].gameObject != null)
-                NetworkServer.ReplacePlayerForConnection(conn, players[i].gameObject, true);
 
-        }
-    }
-  
+
 }

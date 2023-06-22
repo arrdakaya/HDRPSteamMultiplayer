@@ -16,6 +16,12 @@ public class SceneLoader : NetworkBehaviour
     public Image slider;
     public TextMeshProUGUI progressText;
 
+    
+
+
+    private float sceneLoadProgress;
+
+    public bool sceneLoadComplete = false;
     private CustomNetworkManager Manager
     {
         get
@@ -33,18 +39,18 @@ public class SceneLoader : NetworkBehaviour
             Instance = this;
 
     }
-   
-    [ClientRpc]
+
     public async void RpcLoadScene(string sceneName)
     {
-        if (isServer)
-        {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-            asyncLoad.allowSceneActivation = false;
-            await LoadAsync(asyncLoad);
-        }
+        Manager.ServerChangeScene(sceneName);
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        asyncLoad.allowSceneActivation = false;
+        await LoadAsync(NetworkManager.loadingSceneAsync, sceneName);
+
     }
-    public async Task LoadAsync(AsyncOperation asyncLoad)
+
+    public async Task LoadAsync(AsyncOperation asyncLoad,string sceneName)
     {
 
         loadingScreen.SetActive(true);
@@ -56,18 +62,22 @@ public class SceneLoader : NetworkBehaviour
             if (asyncLoad.progress >= 0.9f)
             {
                 asyncLoad.allowSceneActivation = true;
+                sceneLoadComplete = true;
             }
 
             await Task.Yield();
         }
-        Debug.Log("Sahne yükleme iþlemi tamamlandý.");
         if (asyncLoad.isDone)
         {
-            if (isServer)
-            {
-                Manager.SpawnPlayer();
-                NetworkServer.SpawnObjects();
-            }
+            //Manager.SpawnPlayer();
         }
+    
+
+        Debug.Log("Sahne yükleme iþlemi tamamlandý.");
+    
     }
+
+   
+
+
 }

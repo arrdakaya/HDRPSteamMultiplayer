@@ -39,7 +39,8 @@ public class TrapPlacer : NetworkBehaviour
     public GameObject SkillMenu;
 
     private bool isPlayerBlind = false;
-    public GameObject blindPlayer;
+    private GameObject blindPlayer;
+    public GameObject blindnessOnPlayerIcon;
 
     [Header("Trap1")]
     public Image trapImage1;
@@ -85,26 +86,43 @@ public class TrapPlacer : NetworkBehaviour
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 
+            
             if (Physics.Raycast(ray, out hitInfo, distance, PlayerLayer))
             {
-                if (Input.GetMouseButtonDown(1) && isPlayerBlind == false)
+                if (!isCooldown4)
                 {
-                    if (hitInfo.collider.CompareTag("Player"))
+                    blindnessOnPlayerIcon.SetActive(true);
+                    if (Input.GetMouseButtonDown(1) && isPlayerBlind == false)
                     {
-                        if (!isCooldown4)
+                        if (hitInfo.collider.CompareTag("Player"))
                         {
+
                             blindPlayer = hitInfo.transform.gameObject;
                             isCooldown4 = true;
                             blindImage.fillAmount = 1;
-                            StartCoroutine(BlindPlayer());
+                            CmdBlindPlayer();
+
+
                         }
-                       
                     }
                 }
-               
+                else
+                {
+                    blindnessOnPlayerIcon.SetActive(false);
+
+                }
+
             }
-    
-                FailText.SetActive(false);
+            else
+            {
+                blindnessOnPlayerIcon.SetActive(false);
+
+            }
+
+
+
+
+            FailText.SetActive(false);
                 if (Physics.Raycast(ray, out hitInfo, distance, layerMask))
                 {
                     if (!isOverlapping)
@@ -144,7 +162,12 @@ public class TrapPlacer : NetworkBehaviour
                         }
 
                     }
-                    if (hitInfo.collider.CompareTag("GroundTrap"))
+                    else
+                    {
+                        FailText.SetActive(true);
+
+                    }
+                if (hitInfo.collider.CompareTag("GroundTrap"))
                     {
                         if (previewObject == null)
                         {
@@ -170,15 +193,11 @@ public class TrapPlacer : NetworkBehaviour
                         Destroy(groundTrapDestroy);
                         groundTrapCreated = false;
                     }
-
-
-                }
-            
-            else
-            {
-                FailText.SetActive(true);
+                     
 
             }
+            
+               
 
         
         
@@ -508,7 +527,17 @@ public class TrapPlacer : NetworkBehaviour
             }
         }
     }
+    [Command]
+    void CmdBlindPlayer()
+    {
+        RpcBlindPlayer();
+    }
+    [ClientRpc]
+    void RpcBlindPlayer()
+    {
+        StartCoroutine(BlindPlayer());
 
+    }
     IEnumerator BlindPlayer()
     {
 

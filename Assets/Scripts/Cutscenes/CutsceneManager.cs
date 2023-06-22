@@ -32,12 +32,12 @@ public class CutsceneManager : NetworkBehaviour
             }
             playersInTrigger++;
             Debug.Log("playerintrigger: " + playersInTrigger);
-            if (playersInTrigger == Manager.players.Count && isLocalPlayerInTrigger && !timelineStarted)
+            if (playersInTrigger == Manager.playerCount && isLocalPlayerInTrigger && !timelineStarted)
             {
                 RpcStartTimeline(other.gameObject);
             }
             Debug.Log(playersInTrigger);
-            Debug.Log(Manager.players.Count);
+            Debug.Log(Manager.playerCount);
             
            
         }
@@ -64,7 +64,6 @@ public class CutsceneManager : NetworkBehaviour
         timelineStarted = true;
         for (int i = 0; i < playersInTrigger; i++)
         {
-            Debug.Log(Manager.players[i]);
             if (Manager.players[i].GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 Manager.players[i].GetComponent<CameraController>().DisableCamera();

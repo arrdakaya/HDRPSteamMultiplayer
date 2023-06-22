@@ -1,24 +1,42 @@
+using Mirror;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Spawner : MonoBehaviour
+
+public class Spawner : NetworkBehaviour
 {
-    public GameObject Parasite;
+    public GameObject[] Items;
+    private Transform Canvas;
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(Spawn());
+        Canvas = GameObject.Find("SceneCanvas").transform;
+        CmdSpawnObjects();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    [Command(requiresAuthority = false)]
+    void CmdSpawnObjects()
     {
-        
+        RpcSpawnObjects();
+    }
+    [ClientRpc]
+    void RpcSpawnObjects()
+    {
+        StartCoroutine(Spawn());
+
     }
     IEnumerator Spawn()
     {
-        yield return new WaitForSeconds(5);
-        Instantiate(Parasite,this.transform.position,this.transform.rotation);
+        yield return new WaitForSeconds(2);
+        GameObject Timer = Instantiate(Items[0], Items[0].transform.position, Items[0].transform.rotation, Canvas);
+        NetworkServer.Spawn(Timer);
+        for (int i = 1; i < Items.Length; i++)
+        {
+            GameObject spawnObject = Instantiate(Items[i], Items[i].transform.position, Items[i].transform.rotation);
+            NetworkServer.Spawn(spawnObject);
+        }
+
+
     }
 }

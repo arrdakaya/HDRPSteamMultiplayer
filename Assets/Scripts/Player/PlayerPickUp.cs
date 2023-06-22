@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
-
+using Unity.VisualScripting;
 
 public class PlayerPickUp : NetworkBehaviour
 {
@@ -215,25 +215,39 @@ public class PlayerPickUp : NetworkBehaviour
     private void Pickup()
     {
         currentWeapon = hit.transform.gameObject;
-        currentWeapon.transform.GetComponent<Rigidbody>().isKinematic = true;
-        currentWeapon.transform.position = weaponParent.transform.position;
-        currentWeapon.transform.parent = weaponParent.transform;
+        CmdPickUp(currentWeapon);
+    }
+    [Command]
+    void CmdPickUp(GameObject currentWeapon)
+    {
+        currentWeapon.GetComponent<NetworkIdentity>().AssignClientAuthority(connectionToClient);
+        currentWeapon.GetComponent<Rigidbody>().isKinematic = true;
+        //currentWeapon.transform.position = weaponParent.transform.position;
+        //currentWeapon.transform.parent = weaponParent.transform;
+        currentWeapon.GetComponent<ObjectParent>().parent = gameObject;
         currentWeapon.transform.localEulerAngles = new Vector3(75f, 0f, -90f);
         currentWeapon.tag = "PlayerWeapon";
         SaveScript.hasCursedObject = true;
+
     }
     public void Drop()
+    {
+        CmdDrop();
+    }
+    [Command]
+    void CmdDrop()
     {
         if (currentWeapon != null)
         {
             currentWeapon.transform.parent = null;
+            currentWeapon.GetComponent<ObjectParent>().parent = null;
             currentWeapon.transform.GetComponent<Rigidbody>().isKinematic = false;
             currentWeapon.tag = "Weapon";
             currentWeapon = null;
             SaveScript.hasCursedObject = false;
 
         }
-    }           
+    }
   
    
 
@@ -246,6 +260,8 @@ public class PlayerPickUp : NetworkBehaviour
     void RpcDestroyItem(GameObject obj)
     {
         Destroy(obj, 0.2f);
+        NetworkServer.Destroy(obj);
+        
     }
 
 }

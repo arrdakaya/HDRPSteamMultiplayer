@@ -5,8 +5,32 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    public void MultiplayerScene()
+    public static UIManager Instance;
+
+    private void Awake()
     {
-        SceneManager.LoadScene("MainMenu");
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
+   
+    public void PressAnyKey()
+    {
+        if (Input.anyKeyDown)
+        {
+            SceneManager.LoadScene("MainMenu");
+
+        }
+    }
+    private void Update()
+    {
+        if(SceneManager.GetActiveScene().name == "FirstScene")
+        {
+            PressAnyKey();
+        }
+       
+       
+    }
+ 
 }

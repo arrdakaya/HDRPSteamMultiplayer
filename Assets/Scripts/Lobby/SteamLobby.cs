@@ -95,6 +95,12 @@ public class SteamLobby : MonoBehaviour
 
         LobbyController.Instance.DestroyPlayerListItems();
         SteamMatchmaking.LeaveLobby((CSteamID)LobbyController.Instance.CurrentLobbyID);
+        
+    }
+    public void DeleteLobbyData()
+    {
+        SteamMatchmaking.DeleteLobbyData((CSteamID)LobbyController.Instance.CurrentLobbyID, HostAddressKey);
+
     }
     public void GetLobbiesList()
     {

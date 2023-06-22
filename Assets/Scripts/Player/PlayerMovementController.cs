@@ -1,14 +1,17 @@
 using Mirror;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityMultiplayer.Manager;
 
 public class PlayerMovementController : NetworkBehaviour
 {
+ 
+
     public static PlayerMovementController Instance;
     [SerializeField] GameObject Other;
 
-    public bool canMove = true;
-    public bool canCameraMove = true;
+   
 
     private Animator anim;
     float velocityZ = 0.0f;
@@ -30,6 +33,8 @@ public class PlayerMovementController : NetworkBehaviour
     float jumpHeight = 3.0f;
     float gravity = -9.81f;
     private float currentMaxVelocity;
+    public bool canMove;
+    public bool canCameraMove;
 
     //Camera
 
@@ -44,7 +49,38 @@ public class PlayerMovementController : NetworkBehaviour
     private float _yRotation;
 
     private InputManager _inputManager;
-   
+
+    /// <summary>//////////////////////
+    [Header("Movement")]
+    //public float moveSpeed;
+
+    public float groundDrag;
+
+    public float jumpForce;
+    public float jumpCooldown;
+    public float airMultiplier;
+    bool readyToJump;
+
+    [HideInInspector] public float walkSpeed;
+    [HideInInspector] public float sprintSpeed;
+
+    [Header("Keybinds")]
+    public KeyCode jumpKey = KeyCode.Space;
+
+    [Header("Ground Check")]
+    public float playerHeight;
+    public LayerMask whatIsGround;
+    public bool grounded;
+
+
+    float horizontalInput;
+    float verticalInput;
+
+    Vector3 moveDirection;
+
+    Rigidbody rb;
+
+
 
     void Start()
     {
@@ -56,20 +92,21 @@ public class PlayerMovementController : NetworkBehaviour
         Camera.GetComponent<AudioListener>().enabled = isLocalPlayer;
 
         if (!isLocalPlayer) { return; }
-        controller = gameObject.GetComponent<CharacterController>();
-        controller.enabled = false;
-        transform.position = new Vector3(Random.Range(0,-25), 5, Random.Range(0,-11));
-        controller.enabled = true;
+        //controller = gameObject.GetComponent<CharacterController>();
+
         anim = GetComponent<Animator>();
         _inputManager = GetComponent<InputManager>();
+
         velocityZHash = Animator.StringToHash("Velocity Z");
         velocityXHash = Animator.StringToHash("Velocity X");
+        ///////////////////////////////////////
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+
+        readyToJump = true;
     }
     void Update()
     {
-
-        if (transform.position == new Vector3(0, 5, 0))
-            Debug.Log("knonumdayýz");
         if (isLocalPlayer)
         {
             bool forwardPressed = Input.GetKey(KeyCode.W);
@@ -82,21 +119,37 @@ public class PlayerMovementController : NetworkBehaviour
 
             if (canMove)
             {
+
+           
                 changeVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
                 LockOrResetVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
             
 
-            anim.SetFloat(velocityZHash, velocityZ);
-            anim.SetFloat(velocityXHash, velocityX);
-            Move();
+                anim.SetFloat(velocityZHash, velocityZ);
+                anim.SetFloat(velocityXHash, velocityX);
+                //Move();
+
+                // ground check
+                grounded = !Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
+
+                Move();
             }
             else
             {
                 anim.SetFloat(velocityZHash, 0);
                 anim.SetFloat(velocityXHash, 0);
             }
+
+
+
+
+
+         
+            
+            EscapeMenu();
         }
     }
+  
     private void LateUpdate()
     {
         if (isLocalPlayer)
@@ -104,8 +157,11 @@ public class PlayerMovementController : NetworkBehaviour
            
                 CamMovements();
 
-           
-            GetMousePosition();
+            if (!gameObject.CompareTag("Monster"))
+            {
+                GetMousePosition();
+            }
+
         }
     }
 
@@ -138,11 +194,11 @@ public class PlayerMovementController : NetworkBehaviour
 
     void LockOrResetVelocity(bool forwardPressed, bool backPressed, bool leftPressed, bool rightPressed, bool runPressed, float currentMaxVelocity)
     {
-        if (!forwardPressed && !backPressed && velocityZ != 0.0f && (velocityZ > -0.05f && velocityZ < 0.05f))
+        if (!forwardPressed && !backPressed && velocityZ != 0.0f)
             velocityZ = 0.0f;
 
 
-        if (!leftPressed && !rightPressed && velocityX != 0.0f && (velocityX > -0.05f && velocityX < 0.05f))
+        if (!leftPressed && !rightPressed && velocityX != 0.0f)
             velocityX = 0.0f;
 
         if (forwardPressed && runPressed && velocityZ > currentMaxVelocity)
@@ -152,35 +208,55 @@ public class PlayerMovementController : NetworkBehaviour
         else if (forwardPressed && velocityZ > currentMaxVelocity)
         {
             velocityZ -= Time.deltaTime * deceleration;
-            if (velocityZ > currentMaxVelocity && velocityZ < (currentMaxVelocity + 0.05))
+            if (velocityZ > currentMaxVelocity && velocityZ < (currentMaxVelocity + 0.2))
             {
                 velocityZ = currentMaxVelocity;
             }
 
         }
         //round to the currentMaxVelocity if within offset
-        else if (forwardPressed && velocityZ < currentMaxVelocity && velocityZ > (currentMaxVelocity - 0.05f))
+        else if (forwardPressed && velocityZ < currentMaxVelocity && velocityZ > (currentMaxVelocity - 0.2f))
         {
             velocityZ = currentMaxVelocity;
+
+        }
+        //backPress
+        if (backPressed && runPressed && velocityZ < -currentMaxVelocity)
+        {
+            velocityZ = currentMaxVelocity;
+        }
+        else if (backPressed && velocityZ < -currentMaxVelocity)
+        {
+            velocityZ -= Time.deltaTime * deceleration;
+            if (velocityZ < -currentMaxVelocity && velocityZ < (-currentMaxVelocity - 0.2))
+            {
+                velocityZ = -currentMaxVelocity;
+            }
+
+        }
+        //round to the currentMaxVelocity if within offset
+        else if (backPressed && velocityZ > -currentMaxVelocity && velocityZ > (-currentMaxVelocity + 0.2f))
+        {
+            velocityZ = -currentMaxVelocity;
 
         }
         //lock left
         if (leftPressed && runPressed && velocityX < -currentMaxVelocity)
         {
-            velocityX -= -currentMaxVelocity;
+            velocityX = -currentMaxVelocity;
 
         }
         //decelarate to the maximum walk velocity
         else if (leftPressed && velocityX < -currentMaxVelocity)
         {
             velocityX += Time.deltaTime * deceleration;
-            if (velocityX < -currentMaxVelocity && velocityX > (-currentMaxVelocity - 0.0f))
+            if (velocityX < -currentMaxVelocity && velocityX > (-currentMaxVelocity - 0.2f))
             {
                 velocityX = -currentMaxVelocity;
             }
         }
         //round to the currentMaxVelocity
-        else if (leftPressed && velocityX > -currentMaxVelocity && velocityX < (-currentMaxVelocity + 0.05f))
+        else if (leftPressed && velocityX > -currentMaxVelocity && velocityX < (-currentMaxVelocity + 0.2f))
         {
             velocityX = -currentMaxVelocity;
         }
@@ -195,53 +271,52 @@ public class PlayerMovementController : NetworkBehaviour
         {
             velocityX -= Time.deltaTime * deceleration;
             //round to currentMaxVelocity
-            if (velocityX > currentMaxVelocity && velocityX < (currentMaxVelocity + 0.05f))
+            if (velocityX > currentMaxVelocity && velocityX < (currentMaxVelocity + 0.2f))
             {
                 velocityX = currentMaxVelocity;
             }
         }
-        else if (rightPressed && velocityX < currentMaxVelocity && velocityX > (currentMaxVelocity - 0.05f))
+        else if (rightPressed && velocityX < currentMaxVelocity && velocityX > (currentMaxVelocity - 0.2f))
         {
             velocityX = currentMaxVelocity;
         }
     }
 
-    private void Move()
-    {
-        
-            isGrounded = controller.isGrounded;
+    //private void Move()
+    //{
+        //isGrounded = controller.isGrounded;
 
-            if (isGrounded && playerVelocity.y < 0)
-                playerVelocity.y = -2f;
+        //if (isGrounded && playerVelocity.y < 0)
+        //    playerVelocity.y = -2f;
 
-            float x = Input.GetAxis("Horizontal");
-            float z = Input.GetAxis("Vertical");
+        //float x = Input.GetAxis("Horizontal");
+        //float z = Input.GetAxis("Vertical");
 
-            Vector3 move = transform.right * x + transform.forward * z;
-            controller.Move(move * currentMaxVelocity * Time.deltaTime);
+        //Vector3 move = transform.right * x + transform.forward * z;
 
-            if (Input.GetButtonDown("Jump") && isGrounded)
-            {
-                playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
-            playerVelocity.y += gravity * Time.deltaTime;
-            controller.Move(playerVelocity * Time.deltaTime);
-        
-        
-    }
+        //if (Input.GetButtonDown("Jump") && isGrounded)
+        //{
+        //    playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        //}
+        //playerVelocity.y += gravity * Time.deltaTime;
+        //controller.Move(move * currentMaxVelocity * Time.deltaTime);
 
+        //controller.Move(playerVelocity * Time.deltaTime);
+
+    //}
+  
     // Update is called once per frame
     private void CamMovements()
     {
   
             if (!anim) return;
-
+        if (canCameraMove)
+        {
             var Mouse_X = _inputManager.Look.x;
             var Mouse_Y = _inputManager.Look.y;
             Camera.transform.position = CameraRoot.position;
 
-        if (canCameraMove)
-        {
+
             _xRotation -= Mouse_Y * MouseSensitivity * Time.deltaTime;
             _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
 
@@ -263,21 +338,35 @@ public class PlayerMovementController : NetworkBehaviour
 
             }
         }
+           
+        
     }
 
 
     [Command]
+    private void CmdAnimatorIK()
+    {
+        RpcAnimatorIK();
+    }
+    [ClientRpc]
+    private void RpcAnimatorIK()
+    {
+        OnAnimatorIK();
+    }
+    
     private void OnAnimatorIK()
     {
         if (!anim) return;
+
         if (isLocalPlayer)
         {
-
-            anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
-            Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
-            anim.SetLookAtPosition(lookAtRay.GetPoint(25));
-
-
+            if (NetworkClient.ready)
+            {
+                
+                    anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
+                    Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
+                    anim.SetLookAtPosition(lookAtRay.GetPoint(25));
+            }
         }
     }
     void GetMousePosition()
@@ -290,5 +379,87 @@ public class PlayerMovementController : NetworkBehaviour
     }
 
 
+    private void MyInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
 
+        // when to jump
+        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        {
+            readyToJump = false;
+
+            Jump();
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+
+    private void MovePlayer()
+    {
+        // calculate movement direction
+        moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
+
+        // on ground NORMALIZED SONRADAN EKLEME ÇAPRAZ GÝDERKEN AYNI HIZDA GÝTSÝN DÝYE
+        if (grounded)
+            rb.AddForce(moveDirection.normalized * currentMaxVelocity * 50f, ForceMode.Acceleration);
+        // in air
+        else if (!grounded)
+            rb.AddForce(moveDirection * currentMaxVelocity * 50f * airMultiplier, ForceMode.Acceleration);
+
+    }
+
+    private void SpeedControl()
+    {
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        // limit velocity if needed
+        if (flatVel.magnitude > currentMaxVelocity)
+        {
+            Vector3 limitedVel = flatVel.normalized * currentMaxVelocity;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
+    }
+
+    private void Jump()
+    {
+        // reset y velocity
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+    private void ResetJump()
+    {
+        readyToJump = true;
+    }
+    private void EscapeMenu()
+    {
+        if (SceneManager.GetActiveScene().name == "EarlyMapDesign")
+        {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                if (PlayerUIManager.Instance.EscMenu.activeSelf)
+                {
+                    PlayerUIManager.Instance.EscMenu.SetActive(true);
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                }
+                else
+                {
+                    PlayerUIManager.Instance.EscMenu.SetActive(false);
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
+
+
+            }
+        }
+    }
+    private void Move()
+    {
+        MyInput();
+        SpeedControl();
+        MovePlayer();
+
+    }
 }

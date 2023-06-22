@@ -37,7 +37,7 @@ public class PlayerObjectController : NetworkBehaviour
     }
     private void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
 
     }
 
@@ -45,6 +45,8 @@ public class PlayerObjectController : NetworkBehaviour
     {
         if (!isLocalPlayer) { return;}
        
+
+
     }
     private void PlayerReadyUpdate(bool oldValue, bool newValue)
     {
@@ -153,12 +155,15 @@ public class PlayerObjectController : NetworkBehaviour
         SceneManager.LoadScene("MainMenu");
 
         SteamLobby.Instance.LeaveLobby();
+        
 
         if (isOwned)
         {
             if (isServer)
             {
                 manager.StopHost();
+                Debug.Log("stophost");
+                
             }
             else
             {
@@ -166,4 +171,5 @@ public class PlayerObjectController : NetworkBehaviour
             }
         }
     }
+  
 }
