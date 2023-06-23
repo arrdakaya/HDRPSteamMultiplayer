@@ -129,8 +129,8 @@ public class PlayerMovementController : NetworkBehaviour
                 anim.SetFloat(velocityXHash, velocityX);
                 //Move();
 
-                // ground check
-                grounded = !Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
+                // ground check playerheigh * 0.5 + 0.3f sildik
+                grounded = !Physics.Raycast(transform.position, Vector3.down, playerHeight, whatIsGround);
 
                 Move();
             }
@@ -140,11 +140,6 @@ public class PlayerMovementController : NetworkBehaviour
                 anim.SetFloat(velocityXHash, 0);
             }
 
-
-
-
-
-         
             
             EscapeMenu();
         }
@@ -282,28 +277,7 @@ public class PlayerMovementController : NetworkBehaviour
         }
     }
 
-    //private void Move()
-    //{
-        //isGrounded = controller.isGrounded;
-
-        //if (isGrounded && playerVelocity.y < 0)
-        //    playerVelocity.y = -2f;
-
-        //float x = Input.GetAxis("Horizontal");
-        //float z = Input.GetAxis("Vertical");
-
-        //Vector3 move = transform.right * x + transform.forward * z;
-
-        //if (Input.GetButtonDown("Jump") && isGrounded)
-        //{
-        //    playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        //}
-        //playerVelocity.y += gravity * Time.deltaTime;
-        //controller.Move(move * currentMaxVelocity * Time.deltaTime);
-
-        //controller.Move(playerVelocity * Time.deltaTime);
-
-    //}
+    
   
     // Update is called once per frame
     private void CamMovements()
@@ -362,17 +336,18 @@ public class PlayerMovementController : NetworkBehaviour
         {
             if (NetworkClient.ready)
             {
-                
-                    anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
-                    Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
-                    anim.SetLookAtPosition(lookAtRay.GetPoint(25));
+                float distance = 25;
+                anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
+                Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
+                anim.SetLookAtPosition(lookAtRay.GetPoint(distance));
             }
         }
     }
     void GetMousePosition()
     {
+        float maxDistance = 999f;
         Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, mouseLayerMask))
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, maxDistance, mouseLayerMask))
         {
             target.position = raycastHit.point;
         }
@@ -438,20 +413,7 @@ public class PlayerMovementController : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                if (PlayerUIManager.Instance.EscMenu.activeSelf)
-                {
-                    PlayerUIManager.Instance.EscMenu.SetActive(true);
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
-                }
-                else
-                {
-                    PlayerUIManager.Instance.EscMenu.SetActive(false);
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                }
-
-
+                PlayerUIManager.Instance.EscapeMenuController();
             }
         }
     }
@@ -462,4 +424,26 @@ public class PlayerMovementController : NetworkBehaviour
         MovePlayer();
 
     }
+    //private void Move()
+    //{
+    //isGrounded = controller.isGrounded;
+
+    //if (isGrounded && playerVelocity.y < 0)
+    //    playerVelocity.y = -2f;
+
+    //float x = Input.GetAxis("Horizontal");
+    //float z = Input.GetAxis("Vertical");
+
+    //Vector3 move = transform.right * x + transform.forward * z;
+
+    //if (Input.GetButtonDown("Jump") && isGrounded)
+    //{
+    //    playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    //}
+    //playerVelocity.y += gravity * Time.deltaTime;
+    //controller.Move(move * currentMaxVelocity * Time.deltaTime);
+
+    //controller.Move(playerVelocity * Time.deltaTime);
+
+    //}
 }

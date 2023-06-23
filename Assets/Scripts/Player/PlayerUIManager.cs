@@ -23,6 +23,21 @@ public class PlayerUIManager : MonoBehaviour
     {
         PlayerObjectController.Instance.Quit();
     }
+    public void EscapeMenuController()
+    {
+        if (!EscMenu.activeSelf)
+        {
+            EscMenu.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            EscMenu.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
 
 }
 
