@@ -32,7 +32,7 @@ public class CutsceneManager : NetworkBehaviour
             }
             playersInTrigger++;
             Debug.Log("playerintrigger: " + playersInTrigger);
-            if (playersInTrigger == Manager.playerCount && isLocalPlayerInTrigger && !timelineStarted)
+            if (playersInTrigger == Manager.playerCount - 1 && isLocalPlayerInTrigger && !timelineStarted)
             {
                 RpcStartTimeline(other.gameObject);
             }
