@@ -6,12 +6,6 @@ public class ObjectParent : NetworkBehaviour
 {
     [SyncVar] public GameObject parent;
 
-
-    //private void Start()
-    //{
-    //    DontDestroyOnLoad(gameObject);
-    //}
-    // Update is called once per frame
     void Update()
     {
         if (parent != null)

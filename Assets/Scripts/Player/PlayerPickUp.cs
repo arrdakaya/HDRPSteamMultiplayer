@@ -32,6 +32,8 @@ public class PlayerPickUp : NetworkBehaviour
     public TextMeshProUGUI doorMessage;
     public AudioClip[] pickupSounds;
 
+    public GameObject playerHand;
+
     GameObject myDoor;
 
     private void Awake()
@@ -208,14 +210,20 @@ public class PlayerPickUp : NetworkBehaviour
 
             }
         }
+        if(currentWeapon != null)
+        {
+            currentWeapon.transform.position = playerHand.transform.position;
+            currentWeapon.transform.rotation = playerHand.transform.rotation;
+        }
     }
         
    
 
     private void Pickup()
     {
-        currentWeapon = hit.transform.gameObject;
-        CmdPickUp(currentWeapon);
+            currentWeapon = hit.transform.gameObject;
+            CmdPickUp(currentWeapon);   
+        
     }
     [Command]
     void CmdPickUp(GameObject currentWeapon)
@@ -224,8 +232,9 @@ public class PlayerPickUp : NetworkBehaviour
         currentWeapon.GetComponent<Rigidbody>().isKinematic = true;
         //currentWeapon.transform.position = weaponParent.transform.position;
         //currentWeapon.transform.parent = weaponParent.transform;
-        currentWeapon.GetComponent<ObjectParent>().parent = gameObject;
-        currentWeapon.transform.localEulerAngles = new Vector3(75f, 0f, -90f);
+        //currentWeapon.GetComponent<ObjectParent>().parent = playerHand;
+        currentWeapon.transform.position = playerHand.transform.position;
+        currentWeapon.transform.rotation = playerHand.transform.rotation;
         currentWeapon.tag = "PlayerWeapon";
         SaveScript.hasCursedObject = true;
 

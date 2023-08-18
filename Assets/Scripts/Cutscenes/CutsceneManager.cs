@@ -1,5 +1,6 @@
 using Mirror;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class CutsceneManager : NetworkBehaviour
@@ -8,6 +9,7 @@ public class CutsceneManager : NetworkBehaviour
     private bool timelineStarted = false;
     public GameObject timelineCamera;
     private bool isLocalPlayerInTrigger = false;
+    private GameObject cutsceneTextObject;
 
     private CustomNetworkManager manager;
     private CustomNetworkManager Manager
@@ -21,28 +23,52 @@ public class CutsceneManager : NetworkBehaviour
             return manager = CustomNetworkManager.singleton as CustomNetworkManager;
         }
     }
-   
+    private void Start()
+    {
+
+        cutsceneTextObject = GameObject.Find("CutsceneCounter");
+
+
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
+            cutsceneTextObject.GetComponent<TextMeshProUGUI>().enabled = true;
+
             if (other.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 isLocalPlayerInTrigger = true;
             }
             playersInTrigger++;
             Debug.Log("playerintrigger: " + playersInTrigger);
-            if (playersInTrigger == Manager.playerCount - 1 && isLocalPlayerInTrigger && !timelineStarted)
+            if(playersInTrigger > 0)
             {
-                RpcStartTimeline(other.gameObject);
+                if (playersInTrigger == Manager.GamePlayers.Count - 1 && isLocalPlayerInTrigger && !timelineStarted)
+                {
+                    RpcStartTimeline(other.gameObject);
+                }
             }
-            Debug.Log(playersInTrigger);
-            Debug.Log(Manager.playerCount);
-            
            
+
+
+
         }
     }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if (isLocalPlayerInTrigger && cutsceneTextObject.activeSelf)
+            {
+                int playerCountWithoutMonster = Manager.GamePlayers.Count - 1;
+                cutsceneTextObject.GetComponent<TextMeshProUGUI>().text = playersInTrigger.ToString() + "/" + playerCountWithoutMonster.ToString();
+            }
+        }
+        
 
+    }
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -52,7 +78,8 @@ public class CutsceneManager : NetworkBehaviour
                 isLocalPlayerInTrigger = false;
             }
             playersInTrigger--;
-            Debug.Log("playerintrigger: " + playersInTrigger);
+
+            cutsceneTextObject.GetComponent<TextMeshProUGUI>().enabled = false;
 
         }
     }

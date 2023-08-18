@@ -12,9 +12,11 @@ public class PlayerObjectController : NetworkBehaviour
     [SyncVar] public ulong PlayerSteamID;
     [SyncVar(hook = nameof(PlayerNameUpdate))] public string PlayerName ;
     [SyncVar(hook = nameof(PlayerReadyUpdate))] public bool Ready;
-    [SyncVar(hook = nameof(PlayerCharacterSelection))] public int PlayerSelectedCharacter;
+    [SyncVar(hook = nameof(PlayerCharacterSelection))] public int PlayerSelectedCharacter = -1;
 
     public CSteamID lobbyID;
+
+    public bool playerNotSelectCharacter = true;
 
 
     private CustomNetworkManager manager;
@@ -38,6 +40,7 @@ public class PlayerObjectController : NetworkBehaviour
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
+       
 
     }
 
@@ -50,6 +53,7 @@ public class PlayerObjectController : NetworkBehaviour
     }
     private void PlayerReadyUpdate(bool oldValue, bool newValue)
     {
+        
         if (isServer)
         {
             this.Ready = newValue;
@@ -68,10 +72,13 @@ public class PlayerObjectController : NetworkBehaviour
 
     public void ChangeReady()
     {
-        if (isOwned)
-        {
-            CmdSetPlayerReady();
-        }
+       
+            if (isOwned)
+            {
+                CmdSetPlayerReady();
+            }
+        
+       
     }
 
 
@@ -129,7 +136,10 @@ public class PlayerObjectController : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdPlayerSelection(int newValue)
     {
-        PlayerCharacterSelection(PlayerSelectedCharacter,newValue);
+
+        PlayerCharacterSelection(PlayerSelectedCharacter, newValue);
+
+        
     }
     private void PlayerCharacterSelection(int oldValue, int newValue)
     {
@@ -148,6 +158,7 @@ public class PlayerObjectController : NetworkBehaviour
     }
     public void Quit()
     {
+        Debug.Log("quit");
         //Set the offline scene to null
         manager.offlineScene = "";
 
@@ -155,21 +166,26 @@ public class PlayerObjectController : NetworkBehaviour
         SceneManager.LoadScene("MainMenu");
 
         SteamLobby.Instance.LeaveLobby();
-        
 
-        if (isOwned)
+
+        if (isLocalPlayer)
         {
             if (isServer)
             {
                 manager.StopHost();
                 Debug.Log("stophost");
-                
+
             }
             else
             {
                 manager.StopClient();
+
+                Debug.Log("stopClient");
+
             }
         }
+            
+        
     }
   
 }

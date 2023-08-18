@@ -5,8 +5,7 @@ using UnityEngine.UI;
 public class CharacterSelection : NetworkBehaviour
 {
     public static CharacterSelection Instance;
-    public int selectedIndex;
-   
+    public Button ReadyButton;
 
   
     private void Awake()
@@ -15,13 +14,18 @@ public class CharacterSelection : NetworkBehaviour
             Instance = this;
 
     }
-    private void Start()
-    {
-        selectedIndex = 2;
-    }
-   
+
+
     public void SelectCharacter(int selectedIndex)
     {
+        if(selectedIndex == 0)
+        {
+            ReadyButton.interactable = false;
+        }
+        else
+        {
+            ReadyButton.interactable = true;
+        }
         LobbyController.Instance.LocalPlayerController.CmdPlayerSelection(selectedIndex);
     }
 }

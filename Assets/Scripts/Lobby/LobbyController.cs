@@ -54,10 +54,12 @@ public class LobbyController : MonoBehaviour
     public void ReadyPlayer()
     {
         LocalPlayerController.ChangeReady();
+
     }
 
     public void UpdateButton()
     {
+       
         if (LocalPlayerController.Ready)
         {
             ReadyButtonText.text = "Not Ready";
@@ -205,6 +207,7 @@ public class LobbyController : MonoBehaviour
             {
                 GameObject ObjectToRemove = playerlistItemToRemove.gameObject;
                 PlayerListItems.Remove(playerlistItemToRemove);
+                NetworkServer.Destroy(ObjectToRemove);
                 Destroy(ObjectToRemove);
                 ObjectToRemove = null;
             }
@@ -214,9 +217,16 @@ public class LobbyController : MonoBehaviour
     {
         foreach (PlayerListItem playerListItem in PlayerListItems)
         {
-            GameObject playerListItemObject = playerListItem.gameObject;
-            Destroy(playerListItemObject);
-            playerListItemObject = null;
+            if (playerListItem != null)
+            {
+                GameObject playerListItemObject = playerListItem.gameObject;
+           
+                NetworkServer.Destroy(playerListItemObject);
+                Destroy(playerListItemObject);
+                playerListItemObject = null;
+                RemovePlayerItem();
+                UpdatePlayerList();
+            }
         }
 
         PlayerListItems.Clear();

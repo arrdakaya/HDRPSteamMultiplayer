@@ -6,8 +6,9 @@ using UnityEngine.SceneManagement;
 public class PlayerUIManager : MonoBehaviour
 {
     public static PlayerUIManager Instance;
+    public static GameManager GameManager;
 
-    public GameObject EscMenu;
+    public bool isEscapePress = false;
 
     private void Awake()
     {
@@ -15,29 +16,38 @@ public class PlayerUIManager : MonoBehaviour
             Instance = this;
 
     }
+
     private void Update()
     {
-       
+        EscapeMenu();
     }
-    public void MainMenuScene()
+    private void EscapeMenu()
     {
-        PlayerObjectController.Instance.Quit();
-    }
-    public void EscapeMenuController()
-    {
-        if (!EscMenu.activeSelf)
+        if (SceneManager.GetActiveScene().name == "EarlyMapDesign")
         {
-            EscMenu.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-        else
-        {
-            EscMenu.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                isEscapePress = !isEscapePress;
+                if (isEscapePress)
+                {
+                    gameObject.GetComponent<PlayerMovementController>().canMove = false;
+                    gameObject.GetComponent<PlayerMovementController>().canCameraMove = false;
+                    GameManager.Instance.EscapeMenuController();
+
+                }
+                else
+                {
+                    gameObject.GetComponent<PlayerMovementController>().canMove = true;
+                    gameObject.GetComponent<PlayerMovementController>().canCameraMove = true;
+                    GameManager.Instance.EscapeMenuController();
+
+                }
+
+            }
         }
     }
+   
+ 
 
 }
 

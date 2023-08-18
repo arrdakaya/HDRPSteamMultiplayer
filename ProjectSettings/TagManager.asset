@@ -20,6 +20,7 @@ TagManager:
   - AITarget
   - TrapPlace
   - WeaponParent
+  - EscMenu
   layers:
   - Default
   - TransparentFX

@@ -11,6 +11,8 @@ public class Timer : NetworkBehaviour
     public TextMeshProUGUI timeText;
     private CustomNetworkManager manager;
     int allPlayersCount = 0;
+    public GameObject monsterCharacter;
+    private bool speedUp = false;
 
     private CustomNetworkManager Manager
     {
@@ -25,11 +27,11 @@ public class Timer : NetworkBehaviour
     }
     void Start()
     {
+        monsterCharacter = GameObject.FindGameObjectWithTag("Monster");
         allPlayersCount = FindObjectsOfType<PlayerMovementController>().Length;
-        if (allPlayersCount == Manager.playerCount)
+        if (allPlayersCount == Manager.GamePlayers.Count)
         {
-            Debug.Log("allpayerscount:" + allPlayersCount);
-            Debug.Log("managerPlayer Count:" + Manager.playerCount);
+           
             startTime = Time.time;
 
         }
@@ -42,6 +44,7 @@ public class Timer : NetworkBehaviour
         {
             RpcStartTimer();
         }
+        
     }
 
     [ClientRpc]
@@ -51,8 +54,18 @@ public class Timer : NetworkBehaviour
         float t = Time.time - startTime;
         string minutes = ((int)t / 60).ToString("00");
         string seconds = (t % 60).ToString("00");
-
         timeText.text = minutes + ":" + seconds;
+        if (monsterCharacter != null)
+        {
+            if (t >= 60.0 && !speedUp)
+            {
+                Debug.Log("1 dakika oldu");
+                monsterCharacter.GetComponent<PlayerMovementController>().maximumWalkVelocity = monsterCharacter.GetComponent<PlayerMovementController>().maximumWalkVelocity * 2;
+                monsterCharacter.GetComponent<PlayerMovementController>().maximumRunVelocity = monsterCharacter.GetComponent<PlayerMovementController>().maximumRunVelocity * 2;
+                speedUp = true;
+            }
+           
+        }
         
     }
 }

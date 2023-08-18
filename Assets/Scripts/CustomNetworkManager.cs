@@ -13,10 +13,9 @@ public class CustomNetworkManager : NetworkManager
     PlayerObjectController gameplayerInstance;
     public List<PlayerObjectController> GamePlayers { get; } = new List<PlayerObjectController>();
     public List<PlayerObjectController> players = new List<PlayerObjectController>();
-    public int playerCount = 0;
     public GameObject objectSpawner;
 
-
+    
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         if(SceneManager.GetActiveScene().name == "Lobby")
@@ -29,17 +28,18 @@ public class CustomNetworkManager : NetworkManager
             GamePlayerInstance.PlayerSteamID = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.Instance.CurrentLobbyID, GamePlayers.Count);
             NetworkServer.AddPlayerForConnection(conn, GamePlayerInstance.gameObject);
 
-            playerCount++;
         }
     }
-  
-    
+
+
+
     public override void ServerChangeScene(string newSceneName)
     {
-        if(SceneManager.GetActiveScene().name == "Lobby" && newSceneName.StartsWith("EarlyMapDesign"))
+        if (SceneManager.GetActiveScene().name == "Lobby" && newSceneName.StartsWith("EarlyMapDesign"))
         {
-            
-            for (int i = playerCount - 1; i >= 0; i--)
+            Debug.Log("gameplayer.count" + GamePlayers.Count);
+
+            for (int i = GamePlayers.Count - 1; i >= 0; i--)
             {
                 var conn = GamePlayers[i].connectionToClient;
                 gameplayerInstance = Instantiate(myPlayer[GamePlayers[i].PlayerSelectedCharacter], new Vector3(Random.Range(0, -25), 10, Random.Range(0, -11)), Quaternion.identity);
@@ -54,12 +54,12 @@ public class CustomNetworkManager : NetworkManager
                 players.Add(gameplayerInstance);
 
             }
-            
-           
+
+
         }
-       
-            NetworkServer.SpawnObjects();
-            base.ServerChangeScene(newSceneName);
+
+        NetworkServer.SpawnObjects();
+        base.ServerChangeScene(newSceneName);
 
     }
 

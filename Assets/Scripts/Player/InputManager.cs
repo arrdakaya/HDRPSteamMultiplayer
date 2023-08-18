@@ -11,7 +11,7 @@ namespace UnityMultiplayer.Manager
         public Vector2 Look { get; private set; }
         public bool Run{ get; private set; }
         private InputActionMap _currentMap;
-        //private InputAction _moveAction;
+        private InputAction _moveAction;
         private InputAction _lookAction;
         //private InputAction _runAction;
 
