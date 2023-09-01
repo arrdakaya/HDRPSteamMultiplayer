@@ -1,441 +1,450 @@
-using Mirror;
+ï»¿using Mirror;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using UnityMultiplayer.Manager;
+#endif
 
-public class PlayerMovementController : NetworkBehaviour
+/* Note: animations are called via the controller for both the character and capsule using animator null checks
+ */
+
+namespace StarterAssets
 {
- 
-
-    public static PlayerMovementController Instance;
-    [SerializeField] GameObject Other;
-
-    private Animator anim;
-    private NetworkAnimator netAnim;
-    float velocityZ = 0.0f;
-    float velocityX = 0.0f;
-    [SerializeField] private float acceleration = 2.0f;
-    [SerializeField] private float deceleration = 2.0f;
-    public float maximumWalkVelocity = 0.5f;
-    public float maximumRunVelocity = 2.0f;
-
-    int velocityZHash;
-    int velocityXHash;
-
-    //Movement
-    private CharacterController controller;
-    private Vector3 playerVelocity;
-
-    bool isGrounded;
-
-    float jumpHeight = 3.0f;
-    float gravity = -9.81f;
-    public float currentMaxVelocity;
-    public bool canMove;
-    public bool canCameraMove;
-
-    //Camera
-
-    [SerializeField] private LayerMask mouseLayerMask = new LayerMask();
-    [SerializeField] private Transform target;
-    [SerializeField] private Transform CameraRoot;
-    [SerializeField] private Camera Camera;
-    private float UpperLimit = -40f;
-    private float BottomLimit = 70f;
-    private float MouseSensitivity = 10.0f;
-    private float _xRotation;
-    private float _yRotation;
-
-    private InputManager _inputManager;
-
-    /// <summary>//////////////////////
-    [Header("Movement")]
-    //public float moveSpeed;
-
-    public float groundDrag;
-
-    public float jumpForce;
-    public float jumpCooldown;
-    public float airMultiplier;
-    bool readyToJump;
-
-    [HideInInspector] public float walkSpeed;
-    [HideInInspector] public float sprintSpeed;
-
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-
-    [Header("Ground Check")]
-    public float playerHeight;
-    public LayerMask whatIsGround;
-    public bool grounded;
-
-
-    float horizontalInput;
-    float verticalInput;
-
-    Vector3 moveDirection;
-
-    Rigidbody rb;
-
-    
-
-
-    void Start()
+    [RequireComponent(typeof(CharacterController))]
+#if ENABLE_INPUT_SYSTEM 
+    [RequireComponent(typeof(PlayerInput))]
+#endif
+    public class PlayerMovementController : NetworkBehaviour
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
-        Other.SetActive(isLocalPlayer);
-        Camera.GetComponent<Camera>().enabled = isLocalPlayer;
-        Camera.GetComponent<AudioListener>().enabled = isLocalPlayer;
+        public static PlayerMovementController Instance;
+
+
+        [Header("Player")]
+        [Tooltip("Move speed of the character in m/s")]
+        public float MoveSpeed = 2.0f;
+
+        [Tooltip("Sprint speed of the character in m/s")]
+        public float SprintSpeed = 5.335f;
+
+
+        [Tooltip("Acceleration and deceleration")]
+        public float SpeedChangeRate = 10.0f;
+
+        public AudioClip LandingAudioClip;
+        public AudioClip[] FootstepAudioClips;
+        [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
+
+        [Space(10)]
+        [Tooltip("The height the player can jump")]
+        public float JumpHeight = 3.0f;
+
+        [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
+        public float Gravity = -9.81f;
+
+        [Space(10)]
+        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
+        public float JumpTimeout = 0.50f;
+
+        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
+        public float FallTimeout = 0.15f;
+
+        [Header("Player Grounded")]
+        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
+        public bool Grounded = true;
+
+        [Tooltip("Useful for rough ground")]
+        public float GroundedOffset = -0.14f;
+
+        [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
+        public float GroundedRadius = 0.28f;
+
+        [Tooltip("What layers the character uses as ground")]
+        public LayerMask GroundLayers;
 
         
-        if (!isLocalPlayer) { return; }
-        controller = gameObject.GetComponent<CharacterController>();
-        controller.enabled = isLocalPlayer;
-        anim = GetComponent<Animator>();
-        netAnim = GetComponent<NetworkAnimator>();
-        _inputManager = GetComponent<InputManager>();
 
-        velocityZHash = Animator.StringToHash("Velocity Z");
-        velocityXHash = Animator.StringToHash("Velocity X");
-        ///////////////////////////////////////
-        //rb = GetComponent<Rigidbody>();
-        //rb.freezeRotation = true;
+        // player
+        private float _speed;
+        private float _animationBlend;
+        private float _targetRotation = 0.0f;
+        private float _rotationVelocity;
+        private float _verticalVelocity;
+        private float _terminalVelocity = 53.0f;
 
-        readyToJump = true;
-    }
-    void Update()
-    {
-        if (isLocalPlayer)
+        // timeout deltatime
+        private float _jumpTimeoutDelta;
+        private float _fallTimeoutDelta;
+
+        // animation IDs
+        private int _animIDSpeed;
+        private int _animIDGrounded;
+        private int _animIDJump;
+        private int _animIDFreeFall;
+        private int _animIDMotionSpeed;
+
+#if ENABLE_INPUT_SYSTEM 
+        private PlayerInput _playerInput;
+#endif
+        private Animator _animator;
+        private CharacterController _controller;
+        private StarterAssetsInputs _input;
+        public Camera _mainCamera;
+
+        private const float _threshold = 0.01f;
+
+        private bool _hasAnimator;
+
+        [Header("Camera")]
+        [SerializeField] private LayerMask mouseLayerMask = new LayerMask();
+        [SerializeField] private Transform target;
+        [SerializeField] private Transform CameraRoot;
+        private float UpperLimit = -40f;
+        private float BottomLimit = 70f;
+        private float MouseSensitivity = 10.0f;
+        private float _xRotation;
+        private float _yRotation;
+        public bool canCameraMove;
+        public bool canMove;
+
+        [SerializeField] GameObject other;
+
+        int moveXAnimationParameterId;
+        int moveZAnimationParameterId;
+
+
+        private bool IsCurrentDeviceMouse
         {
-            bool forwardPressed = Input.GetKey(KeyCode.W);
-            bool backPressed = Input.GetKey(KeyCode.S);
-            bool leftPressed = Input.GetKey(KeyCode.A);
-            bool rightPressed = Input.GetKey(KeyCode.D);
-            bool runPressed = Input.GetKey(KeyCode.LeftShift);
-
-            currentMaxVelocity = runPressed ? maximumRunVelocity : maximumWalkVelocity;
-            changeVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
-            LockOrResetVelocity(forwardPressed, backPressed, leftPressed, rightPressed, runPressed, currentMaxVelocity);
-            
-            if (canMove)
+            get
             {
-                anim.SetFloat(velocityZHash, velocityZ);
-                anim.SetFloat(velocityXHash, velocityX);
-                // ground check playerheigh * 0.5 + 0.3f sildik
-                grounded = !Physics.Raycast(transform.position, Vector3.down, playerHeight, whatIsGround);
-
-                //Move();
-                Move2();
-                
+#if ENABLE_INPUT_SYSTEM
+                return _playerInput.currentControlScheme == "KeyboardMouse";
+#else
+				return false;
+#endif
             }
-            else
-            {
-                anim.SetFloat(velocityZHash, 0);
-                anim.SetFloat(velocityXHash, 0);
-                
-            }
-
-            
         }
-    }
-  
-    private void LateUpdate()
-    {
-        if (isLocalPlayer)
-        {
-           
-                CamMovements();
 
+
+
+
+        private void Start()
+        {
+            if(!isLocalPlayer) { return; }
+            _mainCamera.GetComponent<Camera>().enabled = isLocalPlayer;
+            _mainCamera.GetComponent<AudioListener>().enabled = isLocalPlayer;
+            other.SetActive(isLocalPlayer);
+            _hasAnimator = TryGetComponent(out _animator);
+            _controller = GetComponent<CharacterController>();
+            _controller.enabled = isLocalPlayer;
+            _playerInput = GetComponent<PlayerInput>();
+            _playerInput.enabled = isLocalPlayer;
+            _input = GetComponent<StarterAssetsInputs>();
+            _input.enabled = isLocalPlayer;
+
+            AssignAnimationIDs();
+
+            // reset our timeouts on start
+            _jumpTimeoutDelta = JumpTimeout;
+            _fallTimeoutDelta = FallTimeout;
+
+        }
+
+        private void Update()
+        {
+            if(!isLocalPlayer) { return; }
+            _hasAnimator = TryGetComponent(out _animator);
+
+            JumpAndGravity();
+            GroundedCheck();
+            Move();
+        }
+
+        private void LateUpdate()
+        {
+            if (!isLocalPlayer) { return; }
+
+            CameraRotation();
             if (!gameObject.CompareTag("Monster"))
             {
                 GetMousePosition();
             }
-
         }
-    }
 
-    void changeVelocity(bool forwardPressed, bool backPressed, bool leftPressed,bool rightPressed,bool runPressed,float currentMaxVelocity)
-    {
-        if (forwardPressed && velocityZ < currentMaxVelocity)
-            velocityZ += Time.deltaTime * acceleration;
-
-        if (backPressed && velocityZ > -currentMaxVelocity)
-            velocityZ -= Time.deltaTime * acceleration;
-
-        if (leftPressed && velocityX > -currentMaxVelocity)
-            velocityX -= Time.deltaTime * acceleration;
-
-        if (rightPressed && velocityX < currentMaxVelocity)
-            velocityX += Time.deltaTime * acceleration;
-
-        if (!forwardPressed && velocityZ > 0.0f)
-            velocityZ -= Time.deltaTime * deceleration;
-
-        if (!backPressed && velocityZ < 0.0f)
-            velocityZ += Time.deltaTime * deceleration;
-
-        if (!leftPressed && velocityX < 0.0f)
-            velocityX += Time.deltaTime * deceleration;
-
-        if (!rightPressed && velocityX > 0.0f)
-            velocityX -= Time.deltaTime * deceleration;
-    }
-
-    void LockOrResetVelocity(bool forwardPressed, bool backPressed, bool leftPressed, bool rightPressed, bool runPressed, float currentMaxVelocity)
-    {
-        if (!forwardPressed && !backPressed && velocityZ != 0.0f)
-            velocityZ = 0.0f;
-
-
-        if (!leftPressed && !rightPressed && velocityX != 0.0f)
-            velocityX = 0.0f;
-
-        if (forwardPressed && runPressed && velocityZ > currentMaxVelocity)
+        private void AssignAnimationIDs()
         {
-            velocityZ = currentMaxVelocity;
+            moveXAnimationParameterId = Animator.StringToHash("MoveX");
+            moveZAnimationParameterId = Animator.StringToHash("MoveZ");
+
+
+            _animIDSpeed = Animator.StringToHash("Speed");
+            _animIDGrounded = Animator.StringToHash("Grounded");
+            _animIDJump = Animator.StringToHash("Jump");
+            _animIDFreeFall = Animator.StringToHash("FreeFall");
+            _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
         }
-        else if (forwardPressed && velocityZ > currentMaxVelocity)
+
+        private void GroundedCheck()
         {
-            velocityZ -= Time.deltaTime * deceleration;
-            if (velocityZ > currentMaxVelocity && velocityZ < (currentMaxVelocity + 0.05))
+            // set sphere position, with offset
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
+                transform.position.z);
+            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
+                QueryTriggerInteraction.Ignore);
+
+            // update animator if using character
+            if (_hasAnimator)
             {
-                velocityZ = currentMaxVelocity;
-            }
-
-        }
-        //round to the currentMaxVelocity if within offset
-        else if (forwardPressed && velocityZ < currentMaxVelocity && velocityZ > (currentMaxVelocity - 0.05f))
-        {
-            velocityZ = currentMaxVelocity;
-
-        }
-        //backPress
-        if (backPressed && runPressed && velocityZ < -currentMaxVelocity)
-        {
-            velocityZ = currentMaxVelocity;
-        }
-        else if (backPressed && velocityZ < -currentMaxVelocity)
-        {
-            velocityZ -= Time.deltaTime * deceleration;
-            if (velocityZ < -currentMaxVelocity && velocityZ < (-currentMaxVelocity - 0.05))
-            {
-                velocityZ = -currentMaxVelocity;
-            }
-
-        }
-        //round to the currentMaxVelocity if within offset
-        else if (backPressed && velocityZ > -currentMaxVelocity && velocityZ > (-currentMaxVelocity + 0.05f))
-        {
-            velocityZ = -currentMaxVelocity;
-
-        }
-        //lock left
-        if (leftPressed && runPressed && velocityX < -currentMaxVelocity)
-        {
-            velocityX = -currentMaxVelocity;
-
-        }
-        //decelarate to the maximum walk velocity
-        else if (leftPressed && velocityX < -currentMaxVelocity)
-        {
-            velocityX += Time.deltaTime * deceleration;
-            if (velocityX < -currentMaxVelocity && velocityX > (-currentMaxVelocity - 0.05f))
-            {
-                velocityX = -currentMaxVelocity;
+                _animator.SetBool(_animIDGrounded, Grounded);
             }
         }
-        //round to the currentMaxVelocity
-        else if (leftPressed && velocityX > -currentMaxVelocity && velocityX < (-currentMaxVelocity + 0.05f))
-        {
-            velocityX = -currentMaxVelocity;
-        }
 
-        //lock right
-        if (rightPressed && runPressed && velocityX > currentMaxVelocity)
+        private void CameraRotation()
         {
-            velocityX = currentMaxVelocity;
-        }
-        //decelerate to the maximum walk velocity
-        else if (rightPressed && velocityX > currentMaxVelocity)
-        {
-            velocityX -= Time.deltaTime * deceleration;
-            //round to currentMaxVelocity
-            if (velocityX > currentMaxVelocity && velocityX < (currentMaxVelocity + 0.05f))
+            if (!_hasAnimator) return;
+            if (canCameraMove)
             {
-                velocityX = currentMaxVelocity;
-            }
-        }
-        else if (rightPressed && velocityX < currentMaxVelocity && velocityX > (currentMaxVelocity - 0.05f))
-        {
-            velocityX = currentMaxVelocity;
-        }
-    }
-
-    
-  
-    // Update is called once per frame
-    private void CamMovements()
-    {
-  
-            if (!anim) return;
-        if (canCameraMove)
-        {
-            var Mouse_X = _inputManager.Look.x;
-            var Mouse_Y = _inputManager.Look.y;
-            Camera.transform.position = CameraRoot.position;
+                var Mouse_X = _input.look.x;
+                var Mouse_Y = _input.look.y;
+                _mainCamera.transform.position = CameraRoot.position;
 
 
-            _xRotation -= Mouse_Y * MouseSensitivity * Time.deltaTime;
-            _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
+                _xRotation -= Mouse_Y * MouseSensitivity * Time.deltaTime;
+                _xRotation = Mathf.Clamp(_xRotation, UpperLimit, BottomLimit);
 
-            if (!(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S)))
-            {
-                _yRotation += Mouse_X * MouseSensitivity * Time.deltaTime;
-                _yRotation = Mathf.Clamp(_yRotation, -80, 80);
+                if (_input.move == Vector2.zero)
+                {
+                    _yRotation += Mouse_X * MouseSensitivity * Time.deltaTime;
+                    _yRotation = Mathf.Clamp(_yRotation, -80, 80);
 
-                Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
+                    _mainCamera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
 
+                }
+                else
+                {
+                    transform.Rotate(Vector3.up, _yRotation * MouseSensitivity * Time.deltaTime);
+
+                    _yRotation = Mathf.Lerp(_yRotation, 0, Time.deltaTime * 10.0f);
+                    _mainCamera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
+                    transform.Rotate(Vector3.up, Mouse_X * MouseSensitivity * Time.deltaTime);
+
+                }
             }
             else
             {
-                transform.Rotate(Vector3.up, _yRotation * MouseSensitivity * Time.deltaTime);
-
-                _yRotation = Mathf.Lerp(_yRotation, 0, Time.deltaTime * 10.0f);
-                Camera.transform.localRotation = Quaternion.Euler(_xRotation, _yRotation, 0);
-                transform.Rotate(Vector3.up, Mouse_X * MouseSensitivity * Time.deltaTime);
+                _mainCamera.transform.position = CameraRoot.position;
 
             }
         }
-        else
+
+        private void Move()
         {
-            Camera.transform.position = CameraRoot.position;
+            // set target speed based on move speed, sprint speed and if sprint is pressed
+            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
-        }
+            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
+            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // if there is no input, set the target speed to 0
+            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-    }
-
-
-    
-    
-    private void OnAnimatorIK()
-    {
-        if (!anim) return;
-
-        if (isLocalPlayer)
-        {
-            if (NetworkClient.ready)
+            if (canMove)
             {
-                
-                float distance = 25;
-                //anim.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
-                netAnim.animator.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
-                Ray lookAtRay = new Ray(transform.position, Camera.transform.forward);
-                //anim.SetLookAtPosition(lookAtRay.GetPoint(distance));
-                netAnim.animator.SetLookAtPosition(lookAtRay.GetPoint(distance));
+                // a reference to the players current horizontal velocity
+                float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+
+            float speedOffset = 0.1f;
+            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+
+            // accelerate or decelerate to target speed
+            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+                currentHorizontalSpeed > targetSpeed + speedOffset)
+            {
+                // creates curved result rather than a linear one giving a more organic speed change
+                // note T in Lerp is clamped, so we don't need to clamp our speed
+                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                    Time.deltaTime * SpeedChangeRate);
+
+                // round speed to 3 decimal places
+                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            }
+            else
+            {
+                _speed = targetSpeed;
+            }
+
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            if (_animationBlend < 0.01f) _animationBlend = 0f;
+
+            // normalise input direction
+            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+               
+            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // if there is a move input rotate player when the player is moving
+            if (_input.move != Vector2.zero)
+            {
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+              
+            }
 
 
+            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+           
+
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                            new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
+                // move the player
+
+            // update animator if using character
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                   
+
+                    _animator.SetFloat(moveXAnimationParameterId, _input.move.x);
+                    _animator.SetFloat(moveZAnimationParameterId, _input.move.y);
+            }
+            }
+        }
+
+        private void JumpAndGravity()
+        {
+            if (Grounded)
+            {
+                // reset the fall timeout timer
+                _fallTimeoutDelta = FallTimeout;
+
+                // update animator if using character
+                if (_hasAnimator)
+                {
+                    _animator.SetBool(_animIDJump, false);
+                    _animator.SetBool(_animIDFreeFall, false);
+                }
+
+                // stop our velocity dropping infinitely when grounded
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
+
+                // Jump
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                {
+                    // the square root of H * -2 * G = how much velocity needed to reach desired height
+                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+
+                    // update animator if using character
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDJump, true);
+                    }
+                }
+
+                // jump timeout
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
+                    _jumpTimeoutDelta -= Time.deltaTime;
+                }
+            }
+            else
+            {
+                // reset the jump timeout timer
+                _jumpTimeoutDelta = JumpTimeout;
+
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    // update animator if using character
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDFreeFall, true);
+                    }
+                }
+
+                // if we are not grounded, do not jump
+                _input.jump = false;
+            }
+
+            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+            if (_verticalVelocity < _terminalVelocity)
+            {
+                _verticalVelocity += Gravity * Time.deltaTime;
+            }
+        }
+
+        private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
+        {
+            if (lfAngle < -360f) lfAngle += 360f;
+            if (lfAngle > 360f) lfAngle -= 360f;
+            return Mathf.Clamp(lfAngle, lfMin, lfMax);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
+
+            if (Grounded) Gizmos.color = transparentGreen;
+            else Gizmos.color = transparentRed;
+
+            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
+            Gizmos.DrawSphere(
+                new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
+                GroundedRadius);
+        }
+
+        private void OnFootstep(AnimationEvent animationEvent)
+        {
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                if (FootstepAudioClips.Length > 0)
+                {
+                    var index = Random.Range(0, FootstepAudioClips.Length);
+                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                }
+            }
+        }
+
+        private void OnLand(AnimationEvent animationEvent)
+        {
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+            }
+        }
+        private void OnAnimatorIK()
+        {
+            if (!_hasAnimator) return;
+
+            if (isLocalPlayer)
+            {
+                if (NetworkClient.ready)
+                {
+
+                    float distance = 25;
+                    _animator.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
+                    Ray lookAtRay = new Ray(transform.position, _mainCamera.transform.forward);
+                    _animator.SetLookAtPosition(lookAtRay.GetPoint(distance));
+
+
+                }
+            }
+        }
+        void GetMousePosition()
+        {
+            float maxDistance = 999f;
+            Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, maxDistance, mouseLayerMask))
+            {
+                target.position = raycastHit.point;
             }
         }
     }
-    void GetMousePosition()
-    {
-        float maxDistance = 999f;
-        Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit raycastHit, maxDistance, mouseLayerMask))
-        {
-            target.position = raycastHit.point;
-        }
-    }
 
-
-    //private void MyInput()
-    //{
-    //    horizontalInput = Input.GetAxisRaw("Horizontal");
-    //    verticalInput = Input.GetAxisRaw("Vertical");
-
-    //    // when to jump
-    //    if (Input.GetKey(jumpKey) && readyToJump && grounded)
-    //    {
-    //        readyToJump = false;
-
-    //        Jump();
-
-    //        Invoke(nameof(ResetJump), jumpCooldown);
-    //    }
-    //}
-
-    //private void MovePlayer()
-    //{
-    //    // calculate movement direction
-    //    moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
-
-    //    // on ground NORMALIZED SONRADAN EKLEME ÇAPRAZ GÝDERKEN AYNI HIZDA GÝTSÝN DÝYE
-    //    if (grounded)
-    //        rb.AddForce(moveDirection.normalized * currentMaxVelocity * 50f, ForceMode.Acceleration);
-    //    // in air
-    //    else if (!grounded)
-    //        rb.AddForce(moveDirection.normalized * currentMaxVelocity * 50f * airMultiplier, ForceMode.Acceleration);
-
-    //}
-
-    //private void SpeedControl()
-    //{
-    //    Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-    //    // limit velocity if needed
-    //    if (flatVel.magnitude > currentMaxVelocity)
-    //    {
-    //        Vector3 limitedVel = flatVel.normalized * currentMaxVelocity;
-    //        rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
-    //    }
-    //}
-
-    //private void Jump()
-    //{
-    //    // reset y velocity
-    //    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-    //    rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-    //}
-    //private void ResetJump()
-    //{
-    //    readyToJump = true;
-    //}
-   
-    //private void Move()
-    //{
-    //    MyInput();
-    //    SpeedControl();
-    //    MovePlayer();
-
-    //}
-
-
-
-    private void Move2()
-    {
-        isGrounded = controller.isGrounded;
-
-        if (isGrounded && playerVelocity.y < 0)
-            playerVelocity.y = -2f;
-
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-        playerVelocity.y += gravity * Time.deltaTime;
-        controller.Move(move * currentMaxVelocity   * Time.deltaTime);
-        controller.Move(playerVelocity * Time.deltaTime);
-
-    }
 }

@@ -32,11 +32,19 @@ public class Health : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
+            
             health = Mathf.Clamp(health, 0, maxHealth);
             UpdateHealtUI();
             if (Input.GetKeyDown(KeyCode.H) && health != 100)
             {
-                RestoreHealth(30);
+                if (PlayerAbilities.getMoreHP)
+                {
+                    RestoreHealth(50);
+                }
+                else
+                {
+                    RestoreHealth(30);
+                }
             }
             if(overlay.color.a > 0)
             {

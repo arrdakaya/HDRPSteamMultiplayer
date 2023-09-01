@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 261.4644, g: 323.877, b: 428.7586, a: 1}
+  m_IndirectSpecularColor: {r: 261.40945, g: 323.80362, b: 428.6474, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -689,7 +689,7 @@ MonoBehaviour:
   - {fileID: 8729559870870870053, guid: 95b511732a784bb4c92443a9a22d7b92, type: 3}
   - {fileID: 7805489786869438617, guid: 8af208b5ed5128545ac8383f207bf801, type: 3}
   - {fileID: 7642685664269604438, guid: 3dbb47f3590414746825e240296d9b1c, type: 3}
-  - {fileID: 1834844173730811686, guid: 24e3c3cc17fa26b48aacd571252e1587, type: 3}
+  - {fileID: 1834844173730811686, guid: 8744181de9d2d6f478afdc47b0a41fdf, type: 3}
   - {fileID: 2547536323066728897, guid: 85ddc07dffff47d4c8bdb580113b58dd, type: 3}
   - {fileID: 7110991385522066580, guid: eab3b055d8a9c4842ae5b427b2a9ed74, type: 3}
   - {fileID: 3192881922959238816, guid: 4b174c3a004d4fc479ec0aca0a183722, type: 3}
@@ -703,17 +703,15 @@ MonoBehaviour:
   - {fileID: 4403600250576228818, guid: a3f9b224965bc95499bf08cde18e87c0, type: 3}
   - {fileID: 2363329326449116779, guid: eb3a1faf60200514cb49e8b7b1c39ff1, type: 3}
   - {fileID: 3246419429030741078, guid: 782d3ca7b027877458221365ea7efba6, type: 3}
-  - {fileID: 8268001552528280988, guid: eff89b413148b9648ad7232d9c4233d2, type: 3}
   - {fileID: 2787131222680429080, guid: 40dd316919d9a3144a4868ec00fadaf3, type: 3}
   - {fileID: 937564576840488493, guid: 33d0e2ad46df2fa458a5dae559974feb, type: 3}
   timeInterpolationGui: 0
   GamePlayerPrefab: {fileID: 8108144209026050801, guid: 95b511732a784bb4c92443a9a22d7b92, type: 3}
   myPlayer:
-  - {fileID: 8941891496637374537, guid: 24e3c3cc17fa26b48aacd571252e1587, type: 3}
+  - {fileID: 8941891496637374537, guid: 8744181de9d2d6f478afdc47b0a41fdf, type: 3}
   - {fileID: 6944039443994673694, guid: 3dbb47f3590414746825e240296d9b1c, type: 3}
-  - {fileID: 8941891496637374537, guid: 24e3c3cc17fa26b48aacd571252e1587, type: 3}
+  - {fileID: 8941891496637374537, guid: 8744181de9d2d6f478afdc47b0a41fdf, type: 3}
   players: []
-  playerCount: 0
   objectSpawner: {fileID: 2787131222680429080, guid: 40dd316919d9a3144a4868ec00fadaf3, type: 3}
 --- !u!114 &1721786858
 MonoBehaviour:

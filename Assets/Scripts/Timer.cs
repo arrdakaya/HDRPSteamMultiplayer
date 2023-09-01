@@ -1,4 +1,5 @@
 using Mirror;
+using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,6 @@ public class Timer : NetworkBehaviour
     int allPlayersCount = 0;
     public GameObject monsterCharacter;
     private bool speedUp = false;
-
     private CustomNetworkManager Manager
     {
         get
@@ -27,9 +27,10 @@ public class Timer : NetworkBehaviour
     }
     void Start()
     {
+        Debug.Log("TimerTimerTimer");
         monsterCharacter = GameObject.FindGameObjectWithTag("Monster");
-        allPlayersCount = FindObjectsOfType<PlayerMovementController>().Length;
-        if (allPlayersCount == Manager.GamePlayers.Count)
+        allPlayersCount = FindObjectsOfType<PlayerObjectController>().Length;
+        if (allPlayersCount == Manager.GamePlayers.Count(x => x.connectionToClient.isReady))
         {
            
             startTime = Time.time;
@@ -40,14 +41,22 @@ public class Timer : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (allPlayersCount == Manager.GamePlayers.Count(x => x.connectionToClient.isReady))
-        {
+        
+            if (allPlayersCount == Manager.GamePlayers.Count(x => x.connectionToClient.isReady))
+            {
             RpcStartTimer();
-        }
+            }
+        
+        
         
     }
+    //[Command(requiresAuthority = false)]
+    //private void CmdStartTimer()
+    //{
+    //    RpcStartTimer();
+    //}
 
-    [ClientRpc]
+    //[ClientRpc]
     private void RpcStartTimer()
     {
        
@@ -60,8 +69,8 @@ public class Timer : NetworkBehaviour
             if (t >= 60.0 && !speedUp)
             {
                 Debug.Log("1 dakika oldu");
-                monsterCharacter.GetComponent<PlayerMovementController>().maximumWalkVelocity = monsterCharacter.GetComponent<PlayerMovementController>().maximumWalkVelocity * 2;
-                monsterCharacter.GetComponent<PlayerMovementController>().maximumRunVelocity = monsterCharacter.GetComponent<PlayerMovementController>().maximumRunVelocity * 2;
+                monsterCharacter.GetComponent<PlayerMovementController>().MoveSpeed = monsterCharacter.GetComponent<PlayerMovementController>().MoveSpeed * 2;
+                monsterCharacter.GetComponent<PlayerMovementController>().SprintSpeed = monsterCharacter.GetComponent<PlayerMovementController>().SprintSpeed * 2;
                 speedUp = true;
             }
            

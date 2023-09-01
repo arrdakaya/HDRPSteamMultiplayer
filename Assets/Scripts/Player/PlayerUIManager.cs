@@ -1,5 +1,6 @@
 using System.Collections;
 using Mirror;
+using StarterAssets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

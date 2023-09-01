@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 using Unity.VisualScripting;
+using StarterAssets;
 
 public class PlayerPickUp : NetworkBehaviour
 {
@@ -12,7 +13,6 @@ public class PlayerPickUp : NetworkBehaviour
     private RaycastHit hit;
     public LayerMask includeLayer;
     public GameObject pickupPanel;
-    public GameObject weaponParent;
 
     [Header("Item Features")]
     public Image mainImage;
@@ -66,7 +66,7 @@ public class PlayerPickUp : NetworkBehaviour
                 mainTitle.text = itemTitles[objID];
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-
+                   
                     SaveScript.itemAmts[objID]++;
                     CmdDestroyItem(hit.transform.gameObject);
                 }

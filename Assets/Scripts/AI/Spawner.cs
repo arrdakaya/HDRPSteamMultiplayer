@@ -29,8 +29,8 @@ public class Spawner : NetworkBehaviour
     IEnumerator Spawn()
     {
         yield return new WaitForSeconds(2);
-        GameObject Timer = Instantiate(Items[0], Items[0].transform.position, Items[0].transform.rotation, Canvas);
-        NetworkServer.Spawn(Timer);
+        GameObject timer = Instantiate(Items[0], Items[0].transform.position, Items[0].transform.rotation, Canvas);
+        NetworkServer.Spawn(timer);
         for (int i = 1; i < Items.Length; i++)
         {
             GameObject spawnObject = Instantiate(Items[i], Items[i].transform.position, Items[i].transform.rotation);
