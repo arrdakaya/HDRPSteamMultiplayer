@@ -35,6 +35,9 @@ public class Spawner : NetworkBehaviour
         {
             GameObject spawnObject = Instantiate(Items[i], Items[i].transform.position, Items[i].transform.rotation);
             NetworkServer.Spawn(spawnObject);
+            GameObject healthtemp = Instantiate(Items[1], Items[1].transform.position, Items[1].transform.rotation);
+            NetworkServer.Spawn(healthtemp);
+
         }
 
 
