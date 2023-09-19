@@ -111,6 +111,10 @@ namespace StarterAssets
         int moveXAnimationParameterId;
         int moveZAnimationParameterId;
 
+        Vector2 currentAnimationBlendVector;
+        Vector2 animationVelocity;
+        [SerializeField] float animationSmoothTime = 0.05f;
+
 
         private bool IsCurrentDeviceMouse
         {
@@ -240,7 +244,7 @@ namespace StarterAssets
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
+          
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
@@ -271,12 +275,12 @@ namespace StarterAssets
             {
                 _speed = targetSpeed;
             }
-
+                currentAnimationBlendVector = Vector2.SmoothDamp(currentAnimationBlendVector, _input.move, ref animationVelocity, animationSmoothTime);
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(currentAnimationBlendVector.x, 0.0f, currentAnimationBlendVector.y).normalized;
                
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
@@ -299,12 +303,12 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                //_animator.SetFloat(_animIDSpeed, _animationBlend);
+                //_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                    
 
-                    _animator.SetFloat(moveXAnimationParameterId, _input.move.x);
-                    _animator.SetFloat(moveZAnimationParameterId, _input.move.y);
+                    _animator.SetFloat(moveXAnimationParameterId, currentAnimationBlendVector.x);
+                    _animator.SetFloat(moveZAnimationParameterId, currentAnimationBlendVector.y);
             }
             }
         }

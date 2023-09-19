@@ -25,7 +25,7 @@ public class Health : NetworkBehaviour
 
     private void Start()
     {
-        health = maxHealth;
+        //health = maxHealth;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
     }
     private void Update()
@@ -80,6 +80,11 @@ public class Health : NetworkBehaviour
             health += healAmount;
             lerpTimer = 0f;
             SaveScript.itemAmts[1]--;
+        }
+        if (PlayerAbilities.increaseHP)
+        {
+            health += healAmount;
+            lerpTimer = 0f;
         }
        
     }

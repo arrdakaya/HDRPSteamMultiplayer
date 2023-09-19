@@ -67,11 +67,29 @@ public class CardManager : MonoBehaviour
         }
         
     }
+    public void IncreaseHP()
+    {
+        PlayerAbilities.increaseHP = true;
+        localPlayer.GetComponent<Health>().RestoreHealth(30);
+        CardSelected();
+        
+
+    }
     public void LessDamageTrap()
     {
         if (!PlayerAbilities.lessDamageTrap)
         {
             PlayerAbilities.lessDamageTrap = true;
+            CardSelected();
+        }
+    }
+    public void SpeedUpAbility()
+    {
+        if (!PlayerAbilities.speedUp)
+        {
+            PlayerAbilities.speedUp = true;
+            localPlayer.GetComponent<PlayerMovementController>().MoveSpeed *= 1.3f;
+            localPlayer.GetComponent<PlayerMovementController>().SprintSpeed *= 1.3f;
             CardSelected();
         }
     }
