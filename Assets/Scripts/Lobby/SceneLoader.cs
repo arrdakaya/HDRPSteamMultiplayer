@@ -77,7 +77,24 @@ public class SceneLoader : NetworkBehaviour
     
     }
 
-   
+    [ClientRpc]
+    public void RpcShowLoadingScreen()
+    {
+        // Loading ekranýný tüm oyunculara göster
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(true);
+        }
+    }
+    [ClientRpc]
+    public void RpcHideLoadingScreen()
+    {
+        // Loading ekranýný tüm oyunculara kapat
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(false);
+        }
+    }
 
 
 }

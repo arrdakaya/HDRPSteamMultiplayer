@@ -823,6 +823,7 @@ MonoBehaviour:
   - {fileID: 8941891496637374537, guid: 8744181de9d2d6f478afdc47b0a41fdf, type: 3}
   players: []
   objectSpawner: {fileID: 2787131222680429080, guid: 40dd316919d9a3144a4868ec00fadaf3, type: 3}
+  loadingScreen: {fileID: 1293505427221747352, guid: c5012a00a00b634459c3e312844c4012, type: 3}
 --- !u!114 &1721786858
 MonoBehaviour:
   m_ObjectHideFlags: 0
