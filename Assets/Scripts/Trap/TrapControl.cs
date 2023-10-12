@@ -5,11 +5,9 @@ using UnityEngine;
 
 public class TrapControl : MonoBehaviour
 {
-    private GameObject localPlayer;
     private Animator anim;
     private void Start()
     {
-        localPlayer = GameObject.Find("LocalGamePlayer");
         anim = GetComponent<NetworkAnimator>().animator; 
     }
     private void OnTriggerEnter(Collider other)

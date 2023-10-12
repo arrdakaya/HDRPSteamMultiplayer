@@ -42,7 +42,7 @@ public class CustomNetworkManager : NetworkManager
             for (int i = GamePlayers.Count - 1; i >= 0; i--)
             {
                 var conn = GamePlayers[i].connectionToClient;
-                gameplayerInstance = Instantiate(myPlayer[GamePlayers[i].PlayerSelectedCharacter], new Vector3(Random.Range(0, -25), 10, Random.Range(0, -11)), Quaternion.identity);
+                gameplayerInstance = Instantiate(myPlayer[GamePlayers[i].PlayerSelectedCharacter], new Vector3(Random.Range(0, -12), 10, Random.Range(40, 50)), Quaternion.identity);
                 gameplayerInstance.ConnectionID = GamePlayers[i].ConnectionID;
                 gameplayerInstance.PlayerIdNumber = GamePlayers.Count;
                 gameplayerInstance.PlayerSteamID = GamePlayers[i].PlayerSteamID;

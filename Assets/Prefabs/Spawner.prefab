@@ -66,6 +66,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   Items:
+  - {fileID: 937564576840488493, guid: 33d0e2ad46df2fa458a5dae559974feb, type: 3}
   - {fileID: 8646393521147664119, guid: be17c315bf8199b489013d93a9bd519c, type: 3}
   - {fileID: 3166667098495233167, guid: 26da432b37e158f47a1f14bc35796afc, type: 3}
   - {fileID: 6693165126842010609, guid: 57bf86965a45a4c46aadda729ba23cc7, type: 3}

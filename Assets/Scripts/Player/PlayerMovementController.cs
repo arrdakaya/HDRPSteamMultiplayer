@@ -115,6 +115,10 @@ namespace StarterAssets
         Vector2 animationVelocity;
         [SerializeField] float animationSmoothTime = 0.05f;
 
+        //syncvarIK Animations
+        [SyncVar] private float weight = 0.6f;
+        [SyncVar] private float bodyWeight = 0.2f;
+        [SyncVar] private float headWeight = 1.2f;
 
         private bool IsCurrentDeviceMouse
         {
@@ -432,7 +436,7 @@ namespace StarterAssets
                 {
 
                     float distance = 25;
-                    _animator.SetLookAtWeight(0.6f, 0.2f, 1.2f, 0.5f, 0.5f);
+                    _animator.SetLookAtWeight(weight, bodyWeight, headWeight);
                     Ray lookAtRay = new Ray(transform.position, _mainCamera.transform.forward);
                     _animator.SetLookAtPosition(lookAtRay.GetPoint(distance));
 

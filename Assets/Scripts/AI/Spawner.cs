@@ -11,7 +11,11 @@ public class Spawner : NetworkBehaviour
     void Start()
     {
         Canvas = GameObject.Find("SceneCanvas").transform;
-        CmdSpawnObjects();
+        if (isServer)
+        {
+            CmdSpawnObjects();
+
+        }
     }
 
 

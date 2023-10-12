@@ -28,13 +28,15 @@ public class Timer : NetworkBehaviour
     void Start()
     {
         Debug.Log("TimerTimerTimer");
-        monsterCharacter = GameObject.FindGameObjectWithTag("Monster");
-        allPlayersCount = FindObjectsOfType<PlayerObjectController>().Length;
-        if (allPlayersCount == Manager.GamePlayers.Count(x => x.connectionToClient.isReady))
+        if (GameObject.FindGameObjectWithTag("Monster"))
         {
-           
-            startTime = Time.time;
+            monsterCharacter = GameObject.FindGameObjectWithTag("Monster");
 
+        }
+        allPlayersCount = FindObjectsOfType<PlayerObjectController>().Length;
+        if (isServer)
+        {
+            startTime = Time.time;
         }
     }
 
@@ -42,19 +44,19 @@ public class Timer : NetworkBehaviour
     void Update()
     {
         
-            if (allPlayersCount == Manager.GamePlayers.Count(x => x.connectionToClient.isReady))
+            if (isServer)
             {
-            RpcStartTimer();
+            CmdStartTimer();
             }
         
         
         
     }
-    //[Command(requiresAuthority = false)]
-    //private void CmdStartTimer()
-    //{
-    //    RpcStartTimer();
-    //}
+    [Command(requiresAuthority = false)]
+    private void CmdStartTimer()
+    {
+        RpcStartTimer();
+    }
 
     //[ClientRpc]
     private void RpcStartTimer()
