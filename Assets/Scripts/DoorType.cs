@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using Mirror;
+
 using UnityEngine;
-public class DoorType : MonoBehaviour
+public class DoorType : NetworkBehaviour
 {
     public enum typeOfDoor
     {
@@ -14,15 +14,15 @@ public class DoorType : MonoBehaviour
     public bool locked = false;
     [HideInInspector]
     public string message = "";
-    private Animator anim;
+    private NetworkAnimator netAnim;
 
     // Start is called before the first frame update
     void Start()
     {
-        anim = GetComponent<Animator>();
+        netAnim = GetComponent<NetworkAnimator>();
         if (opened == true)
         {
-            anim.SetTrigger("Open");
+            netAnim.SetTrigger("Open");
             message = "Press E to close the door";
         }
     }

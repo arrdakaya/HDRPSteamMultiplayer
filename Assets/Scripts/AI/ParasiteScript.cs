@@ -10,7 +10,7 @@ public class ParasiteScript : MonoBehaviour
     {
         Idle,
         Walking,
-        
+
 
     }
     public LayerMask PlayerLayer;
@@ -22,7 +22,7 @@ public class ParasiteScript : MonoBehaviour
 
     public GameObject player;
     public float parasiteAlertRange = 10f;
-    private float attackDistance =1.2f;
+    private float attackDistance = 1.2f;
 
     [SerializeField] private AudioSource chaseMusic;
 
@@ -39,17 +39,12 @@ public class ParasiteScript : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         anim.SetTrigger(chooseState.ToString());
-       
-        
-        
     }
 
     // Update is called once per frame
     void Update()
     {
 
-
-       
         animInfo = anim.GetCurrentAnimatorStateInfo(0);
 
         if (animInfo.IsTag("motion"))
@@ -60,11 +55,11 @@ public class ParasiteScript : MonoBehaviour
             }
         }
 
-        Collider[] colliders = Physics.OverlapSphere(transform.position, parasiteAlertRange,PlayerLayer);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, parasiteAlertRange, PlayerLayer);
 
         float closestDistance = Mathf.Infinity;
 
-        if(colliders.Length > 0)
+        if (colliders.Length > 0)
         {
             foreach (var collider in colliders)
             {
@@ -75,7 +70,7 @@ public class ParasiteScript : MonoBehaviour
                     {
                         player = collider.gameObject;
                         closestDistance = distance;
-                        if(closestDistance <= attackDistance)
+                        if (closestDistance <= attackDistance)
                         {
                             agent.isStopped = true;
                             anim.SetBool("Attack", true);
@@ -94,7 +89,7 @@ public class ParasiteScript : MonoBehaviour
                                 chooseState = ParasiteState.Walking;
                                 if (chooseState == ParasiteState.Walking)
                                 {
-                                
+
                                     agent.destination = player.transform.position;
                                     if (chaseMusic.volume < 0.6f)
                                     {
@@ -114,10 +109,10 @@ public class ParasiteScript : MonoBehaviour
                 }
             }
         }
-        else if(colliders.Length < 1)
+        else if (colliders.Length < 1)
         {
             player = null;
-          
+
             if (chaseMusic.volume > 0)
             {
                 chaseMusic.volume -= 0.5f * Time.deltaTime;
@@ -135,7 +130,7 @@ public class ParasiteScript : MonoBehaviour
 
     public void WalkOn()
     {
-        
+
         anim.SetTrigger(chooseState.ToString());
         agent.isStopped = false;
     }

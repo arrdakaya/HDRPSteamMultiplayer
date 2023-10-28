@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
+using UnityEngine.UI;
 
 public class LobbiesListManager : MonoBehaviour
 {
@@ -12,18 +13,22 @@ public class LobbiesListManager : MonoBehaviour
     public GameObject lobbyListContent;
 
     public GameObject lobbiesButton, hostButton;
-
+    [SerializeField] private Button quitButton;
     public List<GameObject> listOfLobbies = new List<GameObject>();
 
     private void Awake()
     {
         if(Instance == null) { Instance = this; }
+        quitButton.onClick.AddListener(() =>
+        {
+            Application.Quit();
+        });
     }
     public void GetListOfLobbies()
     {
         lobbiesButton.SetActive(false);
         hostButton.SetActive(false);
-
+        quitButton.gameObject.SetActive(false);
         lobbiesMenu.SetActive(true);
         SteamLobby.Instance.GetLobbiesList();
     }
@@ -31,8 +36,8 @@ public class LobbiesListManager : MonoBehaviour
     {
         lobbiesButton.SetActive(true);
         hostButton.SetActive(true);
-
         lobbiesMenu.SetActive(false);
+        quitButton.gameObject.SetActive(true);
 
     }
 
@@ -61,4 +66,5 @@ public class LobbiesListManager : MonoBehaviour
         }
         listOfLobbies.Clear();
     }
+
 }

@@ -1,8 +1,9 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ParasiteDamage : MonoBehaviour
+public class ParasiteDamage : NetworkBehaviour
 {
     private Animator anim;
     private int CursedObjectLayerIndex;
@@ -12,12 +13,13 @@ public class ParasiteDamage : MonoBehaviour
     [SerializeField] private Camera myCamera;
     public LayerMask EnemyLayer;
 
-   
+
     private float buttonHoldTimer = 0f;
     private float requiredHoldTime = 3f;
 
     void Start()
     {
+        if (!isLocalPlayer) { return; }
         anim = GetComponent<Animator>();
         CursedObjectLayerIndex = anim.GetLayerIndex("CursedItem");
     }
@@ -25,13 +27,13 @@ public class ParasiteDamage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (!isLocalPlayer) { return; }
         if (SaveScript.hasCursedObject == true)
         {
             anim.SetLayerWeight(CursedObjectLayerIndex, 1f);
             RaycastHit hit;
             if (Physics.Raycast(myCamera.transform.position, myCamera.transform.forward, out hit, range, EnemyLayer))
-            { 
+            {
                 if (Input.GetMouseButton(0))
                 {
                     buttonHoldTimer += Time.deltaTime;
@@ -47,33 +49,26 @@ public class ParasiteDamage : MonoBehaviour
                 {
                     buttonHoldTimer = 0f;
                 }
-             
-
             }
-        
+
         }
         else
         {
             anim.SetLayerWeight(CursedObjectLayerIndex, 0f);
 
         }
-
-
-
-
     }
     void Shoot(RaycastHit hit)
     {
-        
-            EnemyHealth enemyHealth = hit.transform.GetComponent<EnemyHealth>();
-            if(enemyHealth != null )
-            {
-                enemyHealth.TakeDamage(damage);
-                PlayerPickUp.Instance.Drop();
 
-            }
+        EnemyHealth enemyHealth = hit.transform.GetComponent<EnemyHealth>();
+        if (enemyHealth != null)
+        {
+            enemyHealth.TakeDamage(damage);
+            PlayerPickUp.Instance.Drop();
 
+        }
 
     }
- 
+
 }

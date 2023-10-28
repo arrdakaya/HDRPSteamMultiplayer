@@ -3,15 +3,15 @@ using StarterAssets;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-
 public class CutsceneManager : NetworkBehaviour
 {
-    private int playersInTrigger = 0;
+    private TextMeshProUGUI cutsceneTextObject;
+    [SyncVar] private int playersInTrigger = 0;
+    int playerCountWithoutMonster = 0;
     private bool timelineStarted = false;
     public GameObject timelineCamera;
     private bool isLocalPlayerInTrigger = false;
-    private GameObject cutsceneTextObject;
-
+    private string playerTriggerStr;
     private CustomNetworkManager manager;
     private CustomNetworkManager Manager
     {
@@ -26,49 +26,40 @@ public class CutsceneManager : NetworkBehaviour
     }
     private void Start()
     {
+        cutsceneTextObject = GameObject.Find("CutsceneCounter").GetComponent<TextMeshProUGUI>();
+        if (GameObject.FindGameObjectWithTag("Monster"))
+        {
+            playerCountWithoutMonster = Manager.GamePlayers.Count - 1;
 
-        cutsceneTextObject = GameObject.Find("CutsceneCounter");
-
-
+        }
+        else
+        {
+            playerCountWithoutMonster = Manager.GamePlayers.Count;
+        }
     }
-
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            cutsceneTextObject.GetComponent<TextMeshProUGUI>().enabled = true;
-
+            cutsceneTextObject.enabled = true;
             if (other.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 isLocalPlayerInTrigger = true;
             }
             playersInTrigger++;
-            Debug.Log("playerintrigger: " + playersInTrigger);
-            if(playersInTrigger > 0)
+            if (isLocalPlayerInTrigger && cutsceneTextObject.gameObject.activeSelf)
             {
-                if (playersInTrigger == Manager.GamePlayers.Count - 1 && isLocalPlayerInTrigger && !timelineStarted)
+                cutsceneTextObject.text = playersInTrigger.ToString() + "/" + playerCountWithoutMonster.ToString();
+            }
+            if (playersInTrigger > 0)
+            {
+                if ((playersInTrigger == playerCountWithoutMonster) && isLocalPlayerInTrigger && !timelineStarted)
                 {
-                    RpcStartTimeline(other.gameObject);
+                    CmdStartTimeline(other.gameObject);
                 }
             }
            
-
-
-
         }
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            if (isLocalPlayerInTrigger && cutsceneTextObject.activeSelf)
-            {
-                int playerCountWithoutMonster = Manager.GamePlayers.Count - 1;
-                cutsceneTextObject.GetComponent<TextMeshProUGUI>().text = playersInTrigger.ToString() + "/" + playerCountWithoutMonster.ToString();
-            }
-        }
-        
-
     }
     private void OnTriggerExit(Collider other)
     {
@@ -79,16 +70,18 @@ public class CutsceneManager : NetworkBehaviour
                 isLocalPlayerInTrigger = false;
             }
             playersInTrigger--;
-
-            cutsceneTextObject.GetComponent<TextMeshProUGUI>().enabled = false;
-
+            cutsceneTextObject.enabled = false;
         }
     }
-
-    //[ClientRpc]
+   
+    [Command(requiresAuthority =false)]
+    void CmdStartTimeline(GameObject other)
+    {
+        RpcStartTimeline(other);
+    }
+    [ClientRpc]
     void RpcStartTimeline(GameObject other)
     {
-
         timelineStarted = true;
         for (int i = 0; i < playersInTrigger; i++)
         {
@@ -102,13 +95,10 @@ public class CutsceneManager : NetworkBehaviour
             timelineCamera.SetActive(true);
         }
         StartCoroutine(CutsceneFinish(other));
-
     }
-
     IEnumerator CutsceneFinish(GameObject other)
     {
         other.GetComponent<PlayerMovementController>().canMove = false;
-
         yield return new WaitForSeconds(5);
         if (timelineCamera != null)
         {
@@ -122,10 +112,7 @@ public class CutsceneManager : NetworkBehaviour
             }
         }
         other.GetComponent<PlayerMovementController>().canMove = true;
-
-
         Destroy(gameObject);
     }
   
-
 }

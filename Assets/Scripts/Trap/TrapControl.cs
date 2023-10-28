@@ -5,17 +5,16 @@ using UnityEngine;
 
 public class TrapControl : MonoBehaviour
 {
-    private Animator anim;
+    private NetworkAnimator netAnim;
     private void Start()
     {
-        anim = GetComponent<NetworkAnimator>().animator; 
+        netAnim = GetComponent<NetworkAnimator>(); 
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            anim.SetTrigger("TrapTrigger");
-            
+            netAnim.SetTrigger("TrapTrigger");    
             if(other.GetComponent<PlayerAbilities>().GetLessDamageTrap())
             {
                 other.GetComponent<Health>().DecreaseHP(30);
@@ -28,7 +27,6 @@ public class TrapControl : MonoBehaviour
             StartCoroutine("TrapDestroy");
          
         }
-       
     }
     IEnumerator TrapDestroy()
     {

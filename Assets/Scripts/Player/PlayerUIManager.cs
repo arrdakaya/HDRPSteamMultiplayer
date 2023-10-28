@@ -1,10 +1,8 @@
-using System.Collections;
 using Mirror;
-using StarterAssets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerUIManager : MonoBehaviour
+public class PlayerUIManager : NetworkBehaviour
 {
     public static PlayerUIManager Instance;
     public static GameManager GameManager;
@@ -17,9 +15,13 @@ public class PlayerUIManager : MonoBehaviour
             Instance = this;
 
     }
-
+    private void Start()
+    {
+        if(!isLocalPlayer) { return; }
+    }
     private void Update()
     {
+        if (!isLocalPlayer) { return; }
         EscapeMenu();
     }
     private void EscapeMenu()

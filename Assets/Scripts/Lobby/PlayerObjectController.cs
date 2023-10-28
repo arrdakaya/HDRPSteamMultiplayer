@@ -2,29 +2,23 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using UnityEngine.SceneManagement;
-
 public class PlayerObjectController : NetworkBehaviour
 {
     public static PlayerObjectController Instance;
-
     [SyncVar] public int ConnectionID;
     [SyncVar] public int PlayerIdNumber;
     [SyncVar] public ulong PlayerSteamID;
-    [SyncVar(hook = nameof(PlayerNameUpdate))] public string PlayerName ;
+    [SyncVar(hook = nameof(PlayerNameUpdate))] public string PlayerName;
     [SyncVar(hook = nameof(PlayerReadyUpdate))] public bool Ready;
     [SyncVar(hook = nameof(PlayerCharacterSelection))] public int PlayerSelectedCharacter = -1;
-
     public CSteamID lobbyID;
-
     public bool playerNotSelectCharacter = true;
-
-
     private CustomNetworkManager manager;
     private CustomNetworkManager Manager
     {
         get
         {
-            if(manager != null)
+            if (manager != null)
             {
                 return manager;
             }
@@ -35,25 +29,17 @@ public class PlayerObjectController : NetworkBehaviour
     {
         if (Instance == null)
             Instance = this;
-
     }
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-       
-
     }
-
     private void Update()
     {
-        if (!isLocalPlayer) { return;}
-       
-
-
+        if (!isLocalPlayer) { return; }
     }
     private void PlayerReadyUpdate(bool oldValue, bool newValue)
     {
-        
         if (isServer)
         {
             this.Ready = newValue;
@@ -63,25 +49,18 @@ public class PlayerObjectController : NetworkBehaviour
             LobbyController.Instance.UpdatePlayerList();
         }
     }
-
     [Command]
     private void CmdSetPlayerReady()
     {
         this.PlayerReadyUpdate(this.Ready, !this.Ready);
     }
-
     public void ChangeReady()
     {
-       
-            if (isOwned)
-            {
-                CmdSetPlayerReady();
-            }
-        
-       
+        if (isOwned)
+        {
+            CmdSetPlayerReady();
+        }
     }
-
-
     public override void OnStartAuthority()
     {
         CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
@@ -123,23 +102,15 @@ public class PlayerObjectController : NetworkBehaviour
             CmdCanStartGame(sceneName);
         }
     }
-
     [Command]
     public void CmdCanStartGame(string sceneName)
     {
         manager.StartGame(sceneName);
     }
-
-  
-   
-
     [Command(requiresAuthority = false)]
     public void CmdPlayerSelection(int newValue)
     {
-
         PlayerCharacterSelection(PlayerSelectedCharacter, newValue);
-
-        
     }
     private void PlayerCharacterSelection(int oldValue, int newValue)
     {
@@ -161,31 +132,21 @@ public class PlayerObjectController : NetworkBehaviour
         Debug.Log("quit");
         //Set the offline scene to null
         manager.offlineScene = "";
-
         //Make the active scene the offline scene
         SceneManager.LoadScene("MainMenu");
-
         SteamLobby.Instance.LeaveLobby();
-
-
         if (isLocalPlayer)
         {
             if (isServer)
             {
                 manager.StopHost();
                 Debug.Log("stophost");
-
             }
             else
             {
                 manager.StopClient();
-
                 Debug.Log("stopClient");
-
             }
         }
-            
-        
     }
-  
 }

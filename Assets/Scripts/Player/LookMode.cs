@@ -2,40 +2,35 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class LookMode : NetworkBehaviour
 {
     [SerializeField] GameObject flashlightOverlay;
+    [SerializeField] FlashlightScript flashlightScript;
     [SerializeField] bool flashLightOn;
     [SerializeField] Light flashLight;
-
+    [SerializeField] private float drainTime = 2;
     // Start is called before the first frame update
     void Start()
     {
         flashLight.GetComponent<Light>().enabled = isLocalPlayer;
         flashLight.enabled = false;
         flashlightOverlay.SetActive(isLocalPlayer);
-        flashlightOverlay.SetActive(false);
-       
+        //flashlightOverlay.SetActive(false);
     }
-
     // Update is called once per frame
     void Update()
     {
         if (!isLocalPlayer) return;
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (!flashLightOn)
+            if (!flashLightOn && flashlightScript.batteryPower > 0)
             {
-                if(isLocalPlayer)
-                flashlightOverlay.SetActive(true);
-
+                //flashlightOverlay.SetActive(true);
                 CMDFlashOn();
             }
-            else if(flashLightOn)
+            else
             {
-                if(isLocalPlayer)
-                flashlightOverlay.SetActive(false);
+                //flashlightOverlay.SetActive(false);
                 CMDFlashOff();
             }
         }
@@ -43,46 +38,39 @@ public class LookMode : NetworkBehaviour
         {
             
             FlasLightSwitchOff();
-
         }
+
     }
     [Command]
     void CMDFlashOn()
     {
         RPCFlashOn();
     }
-
     [ClientRpc]
     private void RPCFlashOn()
-    {
-       
+    {      
         flashLight.enabled = true;
         flashLightOn = true;
+        flashlightScript.InvokeRepeating("BatteryDrain", drainTime, drainTime);
         FlasLightSwitchOff();
     }
-
     [Command]
     void CMDFlashOff()
     {
         RPCFlashOff();
     }
-
     [ClientRpc]
     private void RPCFlashOff()
-    {
-        
+    {       
         flashLight.enabled = false;
-        flashlightOverlay.GetComponent<FlashlightScript>().StopDrain();
+        flashlightScript.StopDrain();
         flashLightOn = false;
     }
-
-
     private void FlasLightSwitchOff()
-    {
-        
-        if(flashlightOverlay.GetComponent<FlashlightScript>().batteryPower <= 0)
+    {       
+        if(flashlightScript.batteryPower <= 0)
         {
-            flashlightOverlay.SetActive(false);
+            //flashlightOverlay.SetActive(false);
             CMDFlashOff();
         }
     }
